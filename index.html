@@ -4,7 +4,53 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>B1S2W AI</title>
-</head>
+<style>
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:#111827;
+  color:white;
+  text-align:center;
+  padding:20px;
+}
+
+h1{
+  color:#00ff99;
+}
+
+input{
+  width:90%;
+  max-width:500px;
+  padding:12px;
+  font-size:18px;
+  border-radius:10px;
+  border:none;
+  margin:15px 0;
+}
+
+button{
+  padding:12px 24px;
+  font-size:18px;
+  border:none;
+  border-radius:10px;
+  background:#00cc66;
+  color:white;
+  cursor:pointer;
+}
+
+button:hover{
+  background:#00994d;
+}
+
+#answer{
+  margin-top:20px;
+  background:#1f2937;
+  padding:15px;
+  border-radius:10px;
+  min-height:50px;
+  text-align:left;
+}
+    </style></head>
 <body>
 
 <h1>🤖 B1S2W AI</h1>
@@ -14,6 +60,33 @@
 <button id="sendBtn">Send</button>
 
 <div id="answer"></div>
+
+<div id="answer"></div>
+
+<script>
+document.getElementById("sendBtn").addEventListener("click", function () {
+  const question = document.getElementById("question").value;
+
+  if (question.trim() === "") {
+    document.getElementById("answer").innerHTML = "⚠️ আগে একটি প্রশ্ন লিখুন।";
+    return;
+  }
+
+  document.getElementById("answer").innerHTML =
+    "আপনি লিখেছেন: <b>" + question + "</b><br><br>AI সংযোগের পর এখানে উত্তর দেখাবে।";
+});
+</script>
+
+<div id="answer"></div>
+
+<script>
+document.getElementById("sendBtn").addEventListener("click", function () {
+  const question = document.getElementById("question").value;
+
+  document.getElementById("answer").innerHTML =
+  "আপনি লিখেছেন: " + question;
+});
+</script>
 
 </body>
 </html>
