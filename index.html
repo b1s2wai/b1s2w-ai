@@ -76,19 +76,40 @@ AI reply will appear here...
 </div>
 
 
+
 <script>
+async function askAI(){
 
-function askAI(){
+  let question = document.getElementById("question").value;
 
-let q=document.getElementById("question").value;
+  if(question.trim() === ""){
+    document.getElementById("answer").innerHTML = "প্রশ্ন লিখুন।";
+    return;
+  }
 
-document.getElementById("answer").innerHTML =
-"You asked: " + q;
+  document.getElementById("answer").innerHTML = "ভাবছি... 🤖";
+
+  try{
+
+    // এখানে পরে আসল AI কানেকশন যোগ হবে
+
+    setTimeout(function(){
+      document.getElementById("answer").innerHTML =
+      "B1S2W AI: আপনি লিখেছেন — " + question;
+    },1000);
+
+  }
+  catch(error){
+
+    document.getElementById("answer").innerHTML =
+    "সমস্যা হয়েছে। আবার চেষ্টা করুন।";
+
+  }
 
 }
-
 </script>
 
+}
 
 </body>
 </html>
