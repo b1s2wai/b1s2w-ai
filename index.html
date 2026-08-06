@@ -1,56 +1,100 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>B1S2W AI</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>B1S2W AI</title>
 
-<style>
-body{
-background:#0f172a;
-color:white;
-font-family:Arial,sans-serif;
-text-align:center;
-padding:40px;
-}
-h1{
-color:#00ff99;
-}
-input{
-width:80%;
-padding:12px;
-font-size:18px;
-border-radius:10px;
-border:none;
-}
-button{
-margin-top:10px;
-padding:12px 25px;
-font-size:18px;
-background:#00ff99;
-border:none;
-border-radius:10px;
-cursor:pointer;
-}
-</style>
+  <style>
+    body{
+      font-family:Arial,sans-serif;
+      background:#111827;
+      color:white;
+      text-align:center;
+      padding:20px;
+    }
 
+    h1{
+      color:#00ff99;
+    }
+
+    input{
+      width:80%;
+      padding:12px;
+      font-size:18px;
+      border-radius:8px;
+      border:none;
+      margin-top:20px;
+    }
+
+    button{
+      padding:12px 20px;
+      font-size:18px;
+      border:none;
+      border-radius:8px;
+      background:#00cc66;
+      color:white;
+      margin-top:15px;
+      cursor:pointer;
+    }
+
+    #answer{
+      margin-top:25px;
+      font-size:18px;
+      background:#222;
+      padding:15px;
+      border-radius:10px;
+      text-align:left;
+    }
+  </style>
 </head>
+
 <body>
 
 <h1>🤖 B1S2W AI</h1>
-<p>Your Personal AI Assistant</p>
 
-<input id="msg" placeholder="Type your message...">
-<br><br>
-<button onclick="reply()">Send</button>
+<p>Ask anything...</p>
 
-<p id="answer"></p>
+<input id="question" placeholder="Type your question">
+
+<br>
+
+<button onclick="askAI()">Send</button>
+
+<div id="answer"></div>
 
 <script>
-function reply(){
-let text=document.getElementById("msg").value;
-document.getElementById("answer").innerHTML="You said: "+text;
+
+const API_KEY="AQ.Ab8RN6IL8QH8gH0zn3CUGxdYPQn1zNVjm7oUks-a95kvkMEjug
+
+async function askAI(){
+
+let question=document.getElementById("question").value;
+
+document.getElementById("answer").innerHTML="Thinking...";
+
+const response=await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key="+API_KEY,{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+contents:[
+{
+parts:[
+{text:question}
+]
 }
+]
+})
+});
+
+const data=await response.json();
+
+document.getElementById("answer").innerHTML=data.candidates[0].content.parts[0].text;
+
+}
+
 </script>
 
 </body>
