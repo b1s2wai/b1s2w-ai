@@ -1,15 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>B1S2W AI</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>B1S2W AI</title>
+
+<style>
+body{
+background:#0f172a;
+color:white;
+font-family:Arial,sans-serif;
+text-align:center;
+padding:40px;
+}
+h1{
+color:#00ff99;
+}
+input{
+width:80%;
+padding:12px;
+font-size:18px;
+border-radius:10px;
+border:none;
+}
+button{
+margin-top:10px;
+padding:12px 25px;
+font-size:18px;
+background:#00ff99;
+border:none;
+border-radius:10px;
+cursor:pointer;
+}
+</style>
+
 </head>
 <body>
-  <h1>🤖 Welcome to B1S2W AI</h1>
-  <p>My Personal AI Assistant</p>
 
-  <input type="text" placeholder="Ask me anything">
-  <button>Send</button>
+<h1>🤖 B1S2W AI</h1>
+<p>Your Personal AI Assistant</p>
+
+<input id="msg" placeholder="Type your message...">
+<br><br>
+<button onclick="reply()">Send</button>
+
+<p id="answer"></p>
+
+<script>
+function reply(){
+let text=document.getElementById("msg").value;
+document.getElementById("answer").innerHTML="You said: "+text;
+}
+</script>
+
 </body>
 </html>
