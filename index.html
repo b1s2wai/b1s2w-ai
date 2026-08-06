@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>B1S2W AI</title>
 
 <style>
@@ -11,92 +10,103 @@ body{
   margin:0;
   font-family:Arial,sans-serif;
   background:#111827;
-  color:white;
-  text-align:center;
+  color:#fff;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+}
+
+.container{
+  width:90%;
+  max-width:700px;
+  background:#1f2937;
   padding:20px;
+  border-radius:15px;
+  box-shadow:0 0 20px rgba(0,0,0,.3);
 }
 
 h1{
+  text-align:center;
   color:#00ff99;
 }
 
-.box{
-  max-width:500px;
-  margin:auto;
-}
-
 input{
-  width:90%;
+  width:100%;
   padding:12px;
-  font-size:18px;
-  border-radius:10px;
+  margin-top:15px;
   border:none;
-  margin-top:20px;
+  border-radius:10px;
+  font-size:18px;
 }
 
 button{
+  width:100%;
   margin-top:15px;
-  padding:12px 25px;
-  font-size:18px;
+  padding:12px;
   border:none;
   border-radius:10px;
   background:#00cc66;
   color:white;
+  font-size:18px;
+  cursor:pointer;
+}
+
+button:hover{
+  background:#00aa55;
 }
 
 #answer{
   margin-top:20px;
-  background:#1f2937;
+  background:#111827;
   padding:15px;
   border-radius:10px;
-  text-align:left;
+  min-height:80px;
 }
 </style>
-
 </head>
 
 <body>
 
-<div class="box">
-
+<div class="container">
 <h1>🤖 B1S2W AI</h1>
 
-<p>Ask anything...</p>
-
-<input id="question" placeholder="Type your question">
-
-<br>
+<input
+id="question"
+type="text"
+placeholder="Ask me anything...">
 
 <button onclick="askAI()">Send</button>
 
-<div id="answer">
-AI reply will appear here...
-</div>
+<div id="answer"></div>
 
-</div>
+  <script>
 
-
-
-
-
-<script>
 async function askAI(){
 
   const question = document.getElementById("question").value;
 
-  if(question.trim() === ""){
-    document.getElementById("answer").innerHTML = "প্রশ্ন লিখুন।";
+  if(question.trim()===""){
+    document.getElementById("answer").innerHTML="Please type a question.";
     return;
   }
 
-  document.getElementById("answer").innerHTML = "ভাবছি... 🤖";
+  document.getElementById("answer").innerHTML="Thinking... 🤖";
 
-  setTimeout(() => {
+  // আপাতত টেস্ট রিপ্লাই
+  setTimeout(function(){
+
     document.getElementById("answer").innerHTML =
-    "B1S2W AI: " + question + " সম্পর্কে উত্তর দেওয়ার চেষ্টা করছি।";
+    "<b>B1S2W AI:</b><br>" +
+    "আপনি লিখেছেন: <b>" + question + "</b>";
+
   },1000);
 
 }
-      </script>
+
+</script>
+
+</div>
+
 </body>
 </html>
