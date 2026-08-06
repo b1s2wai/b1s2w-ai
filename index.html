@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>B1S2W AI</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>B1S2W AI</title>
+
 <style>
 body{
   margin:0;
@@ -18,28 +20,28 @@ h1{
   color:#00ff99;
 }
 
+.box{
+  max-width:500px;
+  margin:auto;
+}
+
 input{
   width:90%;
-  max-width:500px;
   padding:12px;
   font-size:18px;
   border-radius:10px;
   border:none;
-  margin:15px 0;
+  margin-top:20px;
 }
 
 button{
-  padding:12px 24px;
+  margin-top:15px;
+  padding:12px 25px;
   font-size:18px;
   border:none;
   border-radius:10px;
   background:#00cc66;
   color:white;
-  cursor:pointer;
-}
-
-button:hover{
-  background:#00994d;
 }
 
 #answer{
@@ -47,46 +49,46 @@ button:hover{
   background:#1f2937;
   padding:15px;
   border-radius:10px;
-  min-height:50px;
   text-align:left;
 }
-    </style></head>
+</style>
+
+</head>
+
 <body>
+
+<div class="box">
 
 <h1>🤖 B1S2W AI</h1>
 
-<input id="question" type="text" placeholder="Ask me anything...">
+<p>Ask anything...</p>
 
-<button id="sendBtn">Send</button>
+<input id="question" placeholder="Type your question">
 
-<div id="answer"></div>
+<br>
 
-<div id="answer"></div>
+<button onclick="askAI()">Send</button>
 
-<script>
-document.getElementById("sendBtn").addEventListener("click", function () {
-  const question = document.getElementById("question").value;
+<div id="answer">
+AI reply will appear here...
+</div>
 
-  if (question.trim() === "") {
-    document.getElementById("answer").innerHTML = "⚠️ আগে একটি প্রশ্ন লিখুন।";
-    return;
-  }
+</div>
 
-  document.getElementById("answer").innerHTML =
-    "আপনি লিখেছেন: <b>" + question + "</b><br><br>AI সংযোগের পর এখানে উত্তর দেখাবে।";
-});
-</script>
-
-<div id="answer"></div>
 
 <script>
-document.getElementById("sendBtn").addEventListener("click", function () {
-  const question = document.getElementById("question").value;
 
-  document.getElementById("answer").innerHTML =
-  "আপনি লিখেছেন: " + question;
-});
+function askAI(){
+
+let q=document.getElementById("question").value;
+
+document.getElementById("answer").innerHTML =
+"You asked: " + q;
+
+}
+
 </script>
+
 
 </body>
 </html>
