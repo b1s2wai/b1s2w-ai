@@ -77,10 +77,12 @@ AI reply will appear here...
 
 
 
+
+
 <script>
 async function askAI(){
 
-  let question = document.getElementById("question").value;
+  const question = document.getElementById("question").value;
 
   if(question.trim() === ""){
     document.getElementById("answer").innerHTML = "প্রশ্ন লিখুন।";
@@ -89,27 +91,12 @@ async function askAI(){
 
   document.getElementById("answer").innerHTML = "ভাবছি... 🤖";
 
-  try{
-
-    // এখানে পরে আসল AI কানেকশন যোগ হবে
-
-    setTimeout(function(){
-      document.getElementById("answer").innerHTML =
-      "B1S2W AI: আপনি লিখেছেন — " + question;
-    },1000);
-
-  }
-  catch(error){
-
+  setTimeout(() => {
     document.getElementById("answer").innerHTML =
-    "সমস্যা হয়েছে। আবার চেষ্টা করুন।";
-
-  }
-
-}
-</script>
+    "B1S2W AI: " + question + " সম্পর্কে উত্তর দেওয়ার চেষ্টা করছি।";
+  },1000);
 
 }
-
+      </script>
 </body>
 </html>
