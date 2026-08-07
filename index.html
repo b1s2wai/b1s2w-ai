@@ -14,7 +14,7 @@ body{
   display:flex;
   justify-content:center;
   align-items:center;
-  height:100vh;
+  min-height:100vh;
 }
 
 .container{
@@ -32,6 +32,7 @@ h1{
 }
 
 input{
+  box-sizing:border-box;
   width:100%;
   padding:12px;
   margin-top:15px;
@@ -52,8 +53,9 @@ button{
   cursor:pointer;
 }
 
-button:hover{
-  background:#00aa55;
+button:disabled{
+  opacity:.6;
+  cursor:not-allowed;
 }
 
 #answer{
@@ -62,6 +64,7 @@ button:hover{
   padding:15px;
   border-radius:10px;
   min-height:80px;
+  white-space:pre-wrap;
 }
 </style>
 </head>
@@ -69,44 +72,69 @@ button:hover{
 <body>
 
 <div class="container">
+
 <h1>🤖 B1S2W AI</h1>
 
 <input
-id="question"
-type="text"
-placeholder="Ask me anything...">
+  id="question"
+  type="text"
+  placeholder="Ask me anything..."
+  autocomplete="off"
+>
 
-<button onclick="askAI()">Send</button>
+<button id="sendButton" onclick="askAI()">Send</button>
 
 <div id="answer"></div>
 
-  <script>
+</div>
 
+<script>
 async function askAI(){
 
-  const question = document.getElementById("question").value;
+  const question = document.getElementById("question").value.trim();
+  const answer = document.getElementById("answer");
+  const button = document.getElementById("sendButton");
 
-  if(question.trim()===""){
-    document.getElementById("answer").innerHTML="Please type a question.";
+  if(!question){
+    answer.textContent = "Please type a question.";
     return;
   }
 
-  document.getElementById("answer").innerHTML="Thinking... 🤖";
+  answer.textContent = "Thinking... 🤖";
+  button.disabled = true;
 
-  // আপাতত টেস্ট রিপ্লাই
-  setTimeout(function(){
+  try{
 
-    document.getElementById("answer").innerHTML =
-    "<b>B1S2W AI:</b><br>" +
-    "আপনি লিখেছেন: <b>" + question + "</b>";
+    const response = await fetch("/api/chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        question: question
+      })
+    });
 
-  },1000);
+    const data = await response.json();
 
+    if(!response.ok){
+      throw new Error(data.error || "Something went wrong.");
+    }
+
+    answer.textContent = "B1S2W AI:\n\n" + data.answer;
+
+  }catch(error){
+
+    answer.textContent =
+      "B1S2W AI:\n\nError: " + error.message;
+
+  }finally{
+
+    button.disabled = false;
+
+  }
 }
-
 </script>
-
-</div>
 
 </body>
 </html>
