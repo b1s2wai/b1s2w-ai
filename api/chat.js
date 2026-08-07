@@ -51,7 +51,9 @@ export default async function handler(req, res) {
 
     if (!response.ok) {
       return res.status(response.status).json({
-        error: data?.error?.message || "Gemini API request failed."
+        error:
+          data?.error?.message ||
+          "Gemini API request failed."
       });
     }
 
@@ -65,7 +67,7 @@ export default async function handler(req, res) {
     }
 
     return res.status(200).json({
-      answer
+      answer: answer
     });
 
   } catch (error) {
@@ -73,4 +75,4 @@ export default async function handler(req, res) {
       error: error.message || "Server error."
     });
   }
-      }
+        }
