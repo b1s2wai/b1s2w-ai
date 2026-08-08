@@ -6,51 +6,81 @@
 <title>B1S2W AI</title>
 
 <style>
+*{
+  box-sizing:border-box;
+}
+
 body{
   margin:0;
   font-family:Arial,sans-serif;
-  background:#111827;
+  background:#0b1120;
   color:#fff;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  min-height:100vh;
 }
 
 .container{
-  width:90%;
-  max-width:700px;
-  background:#1f2937;
-  padding:20px;
-  border-radius:15px;
-  box-shadow:0 0 20px rgba(0,0,0,.3);
+  width:92%;
+  max-width:850px;
+  margin:30px auto;
 }
 
-h1{
+.header{
   text-align:center;
+  padding:20px;
+}
+
+.header h1{
+  margin:0;
   color:#00ff99;
 }
 
-input{
-  box-sizing:border-box;
+.header p{
+  color:#9ca3af;
+}
+
+.card{
+  background:#1f2937;
+  padding:20px;
+  border-radius:16px;
+  margin-top:20px;
+  box-shadow:0 0 20px rgba(0,0,0,.25);
+}
+
+.card h2{
+  margin-top:0;
+}
+
+input,
+textarea,
+select{
   width:100%;
-  padding:12px;
-  margin-top:15px;
+  padding:13px;
+  margin-top:10px;
   border:none;
   border-radius:10px;
-  font-size:18px;
+  font-size:16px;
+  background:#111827;
+  color:white;
+}
+
+textarea{
+  min-height:120px;
+  resize:vertical;
 }
 
 button{
   width:100%;
   margin-top:15px;
-  padding:12px;
+  padding:13px;
   border:none;
   border-radius:10px;
   background:#00cc66;
   color:white;
-  font-size:18px;
+  font-size:17px;
   cursor:pointer;
+}
+
+button:hover{
+  background:#00b359;
 }
 
 button:disabled{
@@ -58,13 +88,30 @@ button:disabled{
   cursor:not-allowed;
 }
 
-#answer{
-  margin-top:20px;
+.answer{
+  margin-top:18px;
   background:#111827;
   padding:15px;
   border-radius:10px;
-  min-height:80px;
+  min-height:70px;
   white-space:pre-wrap;
+}
+
+.video-options{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:15px;
+}
+
+.status{
+  margin-top:15px;
+  color:#9ca3af;
+}
+
+@media(max-width:600px){
+  .video-options{
+    grid-template-columns:1fr;
+  }
 }
 </style>
 </head>
@@ -73,20 +120,79 @@ button:disabled{
 
 <div class="container">
 
-<h1>🤖 B1S2W AI</h1>
+  <div class="header">
+    <h1>🤖 B1S2W AI</h1>
+    <p>AI Assistant & Video Creator</p>
+  </div>
 
-<input
-  id="question"
-  type="text"
-  placeholder="Ask me anything..."
-  autocomplete="off"
->
+  <!-- AI CHAT -->
+  <div class="card">
 
-<button id="sendButton" onclick="askAI()">Send</button>
+    <h2>💬 AI Chat</h2>
 
-<div id="answer"></div>
+    <input
+      id="question"
+      type="text"
+      placeholder="Ask me anything..."
+      autocomplete="off"
+    >
+
+    <button id="sendButton" onclick="askAI()">
+      Send
+    </button>
+
+    <div id="answer" class="answer"></div>
+
+  </div>
+
+
+  <!-- VIDEO GENERATOR -->
+  <div class="card">
+
+    <h2>🎬 Video Generator</h2>
+
+    <textarea
+      id="videoPrompt"
+      placeholder="Describe the video you want to create..."
+    ></textarea>
+
+    <div class="video-options">
+
+      <div>
+        <label>Video Style</label>
+
+        <select id="videoStyle">
+          <option>Anime</option>
+          <option>Cinematic</option>
+          <option>Realistic</option>
+          <option>3D Animation</option>
+          <option>Cartoon</option>
+        </select>
+      </div>
+
+      <div>
+        <label>Duration</label>
+
+        <select id="videoDuration">
+          <option>5 seconds</option>
+          <option>10 seconds</option>
+          <option>15 seconds</option>
+          <option>30 seconds</option>
+        </select>
+      </div>
+
+    </div>
+
+    <button onclick="generateVideo()">
+      🎥 Generate Video
+    </button>
+
+    <div id="videoStatus" class="status"></div>
+
+  </div>
 
 </div>
+
 
 <script>
 
@@ -111,31 +217,17 @@ async function askAI(){
 
   try{
 
-    const response = await fetch("/api/chat", {
-      method: "POST",
-
-      headers: {
-        "Content-Type": "application/json",
-        "Accept": "application/json"
+    const response = await fetch("/api/chat",{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json"
       },
-
-      body: JSON.stringify({
-        question: question
+      body:JSON.stringify({
+        question:question
       })
     });
 
-    const text = await response.text();
-
-    let data;
-
-    try{
-      data = JSON.parse(text);
-    }catch{
-      throw new Error(
-        "Server returned non-JSON response: " +
-        text.substring(0,200)
-      );
-    }
+    const data = await response.json();
 
     if(!response.ok){
       throw new Error(
@@ -144,14 +236,12 @@ async function askAI(){
     }
 
     answer.textContent =
-      "B1S2W AI:\n\n" +
-      (data.answer || "No answer received.");
+      "B1S2W AI:\n\n" + data.answer;
 
   }catch(error){
 
     answer.textContent =
-      "B1S2W AI:\n\nError: " +
-      error.message;
+      "B1S2W AI:\n\nError: " + error.message;
 
   }finally{
 
@@ -160,7 +250,39 @@ async function askAI(){
   }
 }
 
+
+function generateVideo(){
+
+  const prompt =
+    document.getElementById("videoPrompt").value.trim();
+
+  const style =
+    document.getElementById("videoStyle").value;
+
+  const duration =
+    document.getElementById("videoDuration").value;
+
+  const status =
+    document.getElementById("videoStatus");
+
+  if(!prompt){
+
+    status.textContent =
+      "Please describe the video first.";
+
+    return;
+  }
+
+  status.textContent =
+    "🎬 Video Generator UI is ready.\n\n" +
+    "Style: " + style +
+    "\nDuration: " + duration +
+    "\nPrompt: " + prompt +
+    "\n\nReal video generation will be connected in the next step.";
+
+}
+
 </script>
 
 </body>
-</html>
+  </html>
