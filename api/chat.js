@@ -36,8 +36,7 @@ export default async function handler(req, res) {
               parts: [
                 {
                   text:
-                    "You are B1S2W AI, a helpful AI assistant. " +
-                    "Answer the user's question clearly and accurately.\n\n" +
+                    "You are B1S2W AI, a helpful AI assistant.\n\n" +
                     "User: " + question
                 }
               ]
@@ -75,4 +74,4 @@ export default async function handler(req, res) {
       error: error.message || "Server error."
     });
   }
-        }
+}
