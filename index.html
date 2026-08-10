@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>B1S2W AI</title>
 
 <style>
@@ -14,7 +15,7 @@ body{
   margin:0;
   font-family:Arial,sans-serif;
   background:#0b1120;
-  color:#fff;
+  color:white;
 }
 
 .container{
@@ -88,13 +89,15 @@ button:disabled{
   cursor:not-allowed;
 }
 
-.answer{
+.answer,
+.video-result{
   margin-top:18px;
   background:#111827;
   padding:15px;
   border-radius:10px;
   min-height:70px;
   white-space:pre-wrap;
+  word-break:break-word;
 }
 
 .video-options{
@@ -105,11 +108,16 @@ button:disabled{
 
 .status{
   margin-top:15px;
-  background:#111827;
-  padding:15px;
-  border-radius:10px;
-  color:#d1d5db;
+  color:#9ca3af;
   white-space:pre-wrap;
+}
+
+.copy-button{
+  background:#2563eb;
+}
+
+.copy-button:hover{
+  background:#1d4ed8;
 }
 
 @media(max-width:600px){
@@ -126,10 +134,12 @@ button:disabled{
 
   <div class="header">
     <h1>🤖 B1S2W AI</h1>
-    <p>AI Assistant & Video Creator</p>
+    <p>AI Assistant & Video Prompt Creator</p>
   </div>
 
+
   <!-- AI CHAT -->
+
   <div class="card">
 
     <h2>💬 AI Chat</h2>
@@ -141,16 +151,22 @@ button:disabled{
       autocomplete="off"
     >
 
-    <button id="sendButton" onclick="askAI()">
+    <button
+      id="sendButton"
+      onclick="askAI()">
       Send
     </button>
 
-    <div id="answer" class="answer"></div>
+    <div
+      id="answer"
+      class="answer">
+    </div>
 
   </div>
 
 
-  <!-- VIDEO GENERATOR -->
+  <!-- VIDEO PROMPT CREATOR -->
+
   <div class="card">
 
     <h2>🎬 Video Generator</h2>
@@ -160,38 +176,70 @@ button:disabled{
       placeholder="Describe the video you want to create..."
     ></textarea>
 
+
     <div class="video-options">
 
       <div>
+
         <label>Video Style</label>
 
         <select id="videoStyle">
+
           <option>Anime</option>
           <option>Cinematic</option>
           <option>Realistic</option>
           <option>3D Animation</option>
           <option>Cartoon</option>
+
         </select>
+
       </div>
 
+
       <div>
+
         <label>Duration</label>
 
         <select id="videoDuration">
+
           <option>5 seconds</option>
           <option>10 seconds</option>
           <option>15 seconds</option>
           <option>30 seconds</option>
+
         </select>
+
       </div>
 
     </div>
 
-    <button id="videoButton" onclick="generateVideo()">
-      🎥 Generate Video Prompt
+
+    <button onclick="generateVideoPrompt()">
+      ✨ Create Video Prompt
     </button>
 
-    <div id="videoStatus" class="status"></div>
+
+    <div
+      id="videoStatus"
+      class="status">
+    </div>
+
+
+    <div
+      id="videoResult"
+      class="video-result">
+    </div>
+
+
+    <button
+      id="copyButton"
+      class="copy-button"
+      onclick="copyVideoPrompt()"
+      style="display:none;">
+
+      📋 Copy Prompt
+
+    </button>
 
   </div>
 
@@ -200,10 +248,18 @@ button:disabled{
 
 <script>
 
+
+/* =========================
+   AI CHAT
+========================= */
+
 async function askAI(){
 
   const question =
-    document.getElementById("question").value.trim();
+    document
+      .getElementById("question")
+      .value
+      .trim();
 
   const answer =
     document.getElementById("answer");
@@ -211,116 +267,216 @@ async function askAI(){
   const button =
     document.getElementById("sendButton");
 
+
   if(!question){
-    answer.textContent = "Please type a question.";
+
+    answer.textContent =
+      "Please type a question.";
+
     return;
   }
 
-  answer.textContent = "Thinking... 🤖";
+
+  answer.textContent =
+    "Thinking... 🤖";
+
   button.disabled = true;
+
 
   try{
 
-    const response = await fetch("/api/chat",{
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json"
-      },
-      body:JSON.stringify({
-        question:question
-      })
-    });
+    const response =
+      await fetch("/api/chat",{
 
-    const data = await response.json();
+        method:"POST",
+
+        headers:{
+          "Content-Type":"application/json"
+        },
+
+        body:JSON.stringify({
+          question:question
+        })
+
+      });
+
+
+    const data =
+      await response.json();
+
 
     if(!response.ok){
+
       throw new Error(
-        data.error || "Something went wrong."
+        data.error ||
+        "Something went wrong."
       );
+
     }
 
+
     answer.textContent =
-      "B1S2W AI:\n\n" + data.answer;
+      "B1S2W AI:\n\n" +
+      data.answer;
+
 
   }catch(error){
 
     answer.textContent =
-      "B1S2W AI:\n\nError: " + error.message;
+      "B1S2W AI:\n\nError: " +
+      error.message;
 
   }finally{
 
     button.disabled = false;
 
   }
+
 }
 
 
-async function generateVideo(){
+
+/* =========================
+   VIDEO PROMPT CREATOR
+========================= */
+
+function generateVideoPrompt(){
 
   const prompt =
-    document.getElementById("videoPrompt").value.trim();
+    document
+      .getElementById("videoPrompt")
+      .value
+      .trim();
+
 
   const style =
-    document.getElementById("videoStyle").value;
+    document
+      .getElementById("videoStyle")
+      .value;
+
 
   const duration =
-    document.getElementById("videoDuration").value;
+    document
+      .getElementById("videoDuration")
+      .value;
+
 
   const status =
-    document.getElementById("videoStatus");
+    document
+      .getElementById("videoStatus");
 
-  const button =
-    document.getElementById("videoButton");
+
+  const result =
+    document
+      .getElementById("videoResult");
+
+
+  const copyButton =
+    document
+      .getElementById("copyButton");
+
 
   if(!prompt){
 
     status.textContent =
-      "Please describe the video first.";
+      "⚠️ Please describe the video first.";
+
+    result.textContent = "";
+
+    copyButton.style.display =
+      "none";
 
     return;
+
   }
 
-  button.disabled = true;
 
   status.textContent =
-    "🤖 B1S2W AI is creating your video prompt...";
+    "✨ Creating your video prompt...";
+
+
+  const finalPrompt =
+
+`Create a ${duration} high-quality ${style} video.
+
+SUBJECT:
+${prompt}
+
+VISUAL STYLE:
+High-quality cinematic ${style} animation, detailed environment, expressive characters, natural movement, consistent character appearance, beautiful lighting, rich atmosphere and professional visual composition.
+
+CAMERA:
+Smooth cinematic camera movement, natural tracking, stable framing, realistic depth and subtle parallax.
+
+ANIMATION:
+Fluid motion, natural body movement, realistic hair and clothing movement, consistent lighting and character proportions.
+
+LIGHTING:
+Cinematic lighting with detailed shadows, atmospheric depth and visually appealing highlights.
+
+MOOD:
+Immersive, emotional and cinematic.
+
+QUALITY:
+High detail, clean animation, smooth motion, professional composition, no random text, no watermark, no distorted faces, no extra limbs.`;
+
+
+  result.textContent =
+    finalPrompt;
+
+
+  copyButton.style.display =
+    "block";
+
+
+  status.textContent =
+    "✅ Video prompt ready!";
+
+
+}
+
+
+
+/* =========================
+   COPY VIDEO PROMPT
+========================= */
+
+async function copyVideoPrompt(){
+
+  const result =
+    document
+      .getElementById("videoResult");
+
+
+  const text =
+    result.textContent;
+
+
+  if(!text){
+
+    return;
+
+  }
+
 
   try{
 
-    const response = await fetch("/api/video-prompt",{
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json"
-      },
-      body:JSON.stringify({
-        prompt:prompt,
-        style:style,
-        duration:duration
-      })
-    });
+    await navigator.clipboard.writeText(
+      text
+    );
 
-    const data = await response.json();
 
-    if(!response.ok){
-
-      throw new Error(
-        data.error || "Video prompt generation failed."
-      );
-
-    }
-
-    status.textContent =
-      "🎬 Video Prompt Ready!\n\n" +
-      data.videoPrompt;
+    document
+      .getElementById("videoStatus")
+      .textContent =
+      "✅ Prompt copied!";
 
   }catch(error){
 
-    status.textContent =
-      "❌ Error: " + error.message;
-
-  }finally{
-
-    button.disabled = false;
+    document
+      .getElementById("videoStatus")
+      .textContent =
+      "⚠️ Copy failed. Please copy the prompt manually.";
 
   }
 
