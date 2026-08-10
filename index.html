@@ -105,7 +105,11 @@ button:disabled{
 
 .status{
   margin-top:15px;
-  color:#9ca3af;
+  background:#111827;
+  padding:15px;
+  border-radius:10px;
+  color:#d1d5db;
+  white-space:pre-wrap;
 }
 
 @media(max-width:600px){
@@ -183,8 +187,8 @@ button:disabled{
 
     </div>
 
-    <button onclick="generateVideo()">
-      🎥 Generate Video
+    <button id="videoButton" onclick="generateVideo()">
+      🎥 Generate Video Prompt
     </button>
 
     <div id="videoStatus" class="status"></div>
@@ -251,7 +255,7 @@ async function askAI(){
 }
 
 
-function generateVideo(){
+async function generateVideo(){
 
   const prompt =
     document.getElementById("videoPrompt").value.trim();
@@ -265,6 +269,9 @@ function generateVideo(){
   const status =
     document.getElementById("videoStatus");
 
+  const button =
+    document.getElementById("videoButton");
+
   if(!prompt){
 
     status.textContent =
@@ -273,16 +280,53 @@ function generateVideo(){
     return;
   }
 
+  button.disabled = true;
+
   status.textContent =
-    "🎬 Video Generator UI is ready.\n\n" +
-    "Style: " + style +
-    "\nDuration: " + duration +
-    "\nPrompt: " + prompt +
-    "\n\nReal video generation will be connected in the next step.";
+    "🤖 B1S2W AI is creating your video prompt...";
+
+  try{
+
+    const response = await fetch("/api/video-prompt",{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body:JSON.stringify({
+        prompt:prompt,
+        style:style,
+        duration:duration
+      })
+    });
+
+    const data = await response.json();
+
+    if(!response.ok){
+
+      throw new Error(
+        data.error || "Video prompt generation failed."
+      );
+
+    }
+
+    status.textContent =
+      "🎬 Video Prompt Ready!\n\n" +
+      data.videoPrompt;
+
+  }catch(error){
+
+    status.textContent =
+      "❌ Error: " + error.message;
+
+  }finally{
+
+    button.disabled = false;
+
+  }
 
 }
 
 </script>
 
 </body>
-  </html>
+</html>
