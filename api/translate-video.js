@@ -40,73 +40,91 @@ export default async function handler(req, res) {
     }
 
     const instruction = `
-You are the B1S2W AI Video Dialogue Analyzer.
+You are B1S2W AI Multi-Speaker Video Translation System.
 
-Analyze the entire uploaded video, including audio and visual content.
+Analyze the uploaded video carefully.
 
-The video can contain multiple characters or speakers.
+IMPORTANT:
+The video may contain ONE, TWO, THREE, FOUR, or MANY speakers.
 
-Your job is to create a dialogue timeline.
+Do NOT return only one dialogue.
 
-IMPORTANT RULES:
+Find every clearly distinguishable spoken dialogue segment.
 
-1. Detect the spoken language.
-2. Transcribe every spoken dialogue.
-3. Separate different speakers.
-4. Keep dialogue in chronological order.
-5. Do NOT merge different speakers.
-6. Use Character 1, Character 2, Character 3, etc. when names are unknown.
-7. Keep the same character number for the same speaker throughout the video.
-8. Estimate the start and end timestamp of every dialogue line.
-9. Use MM:SS format.
-10. Preserve very short dialogue such as "Yes", "No", "What?", etc.
-11. Translate every dialogue line into the target language.
-12. Preserve emotion and natural meaning.
-13. Do not summarize.
-14. Do not invent dialogue.
-15. Use the visual appearance of characters when useful for distinguishing speakers.
-16. If exact timing is uncertain, provide the best reasonable timestamp estimate.
-17. Return ONLY valid JSON.
+For every dialogue segment:
 
-Original language:
-${originalLanguage || "Auto Detect"}
+1. Identify the speaker.
+2. Give the speaker a stable label such as:
+   Character 1
+   Character 2
+   Character 3
+   etc.
 
-Target language:
-${targetLanguage}
+3. Estimate the dialogue start time.
+4. Estimate the dialogue end time.
+5. Transcribe the original spoken words.
+6. Translate the dialogue into the requested target language.
+7. Assign a stable voice ID.
 
-Return exactly:
+VOICE RULE:
+- The same speaker should keep the same voice ID throughout the video.
+- Character 1 should normally use voice1.
+- Character 2 should normally use voice2.
+- Character 3 should normally use voice3.
+- Character 4 should normally use voice4.
+- Character 5 should normally use voice5.
+- Character 6 should normally use voice6.
+- If more speakers exist, continue with voice7, voice8, etc.
+- Do NOT give every dialogue segment a new voice if it belongs to the same speaker.
+
+Do not merge different speakers into one dialogue.
+
+Do not invent dialogue that cannot be heard.
+
+If speech is unclear, preserve the closest understandable transcription.
+
+Return ONLY valid JSON.
+
+Use exactly this structure:
 
 {
-  "detectedLanguage": "Japanese",
+  "detectedLanguage": "language name",
   "dialogues": [
     {
       "speaker": "Character 1",
-      "startTime": "00:00",
-      "endTime": "00:03",
-      "transcript": "Original dialogue",
-      "translation": "Translated dialogue"
-    },
-    {
-      "speaker": "Character 2",
-      "startTime": "00:03",
-      "endTime": "00:06",
-      "transcript": "Original dialogue",
+      "speakerId": "speaker_1",
+      "voice": "voice1",
+      "startTime": "00:02.00",
+      "endTime": "00:05.50",
+      "transcript": "Original spoken dialogue",
       "translation": "Translated dialogue"
     }
   ]
 }
+
+Rules for dialogues:
+- Keep chronological order.
+- Every dialogue must have startTime and endTime.
+- Use MM:SS.xx format.
+- Do not put multiple speakers into one dialogue item.
+- Keep speakerId stable throughout the video.
+- Keep voice stable for the same speaker.
+
+Original language:
+${originalLanguage || "auto"}
+
+Target language:
+${targetLanguage}
 `;
 
     const response = await fetch(
       "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent",
       {
         method: "POST",
-
         headers: {
           "Content-Type": "application/json",
           "x-goog-api-key": apiKey
         },
-
         body: JSON.stringify({
           contents: [
             {
@@ -123,7 +141,6 @@ Return exactly:
               ]
             }
           ],
-
           generationConfig: {
             responseMimeType: "application/json"
           }
@@ -137,7 +154,7 @@ Return exactly:
       return res.status(response.status).json({
         error:
           data?.error?.message ||
-          "Gemini video analysis failed."
+          "Gemini video translation request failed."
       });
     }
 
@@ -146,7 +163,7 @@ Return exactly:
 
     if (!resultText) {
       return res.status(500).json({
-        error: "Gemini returned no dialogue."
+        error: "Gemini returned no dialogue data."
       });
     }
 
@@ -160,14 +177,48 @@ Return exactly:
       });
     }
 
+    const dialogues =
+      Array.isArray(result.dialogues)
+        ? result.dialogues
+        : [];
+
+    const cleanedDialogues =
+      dialogues.map((item, index) => ({
+        speaker:
+          item.speaker ||
+          `Character ${index + 1}`,
+
+        speakerId:
+          item.speakerId ||
+          `speaker_${index + 1}`,
+
+        voice:
+          item.voice ||
+          `voice${index + 1}`,
+
+        startTime:
+          item.startTime ||
+          "00:00.00",
+
+        endTime:
+          item.endTime ||
+          "00:00.00",
+
+        transcript:
+          item.transcript ||
+          "",
+
+        translation:
+          item.translation ||
+          ""
+      }));
+
     return res.status(200).json({
       detectedLanguage:
         result.detectedLanguage || "",
 
       dialogues:
-        Array.isArray(result.dialogues)
-          ? result.dialogues
-          : []
+        cleanedDialogues
     });
 
   } catch (error) {
@@ -177,4 +228,4 @@ Return exactly:
         "Server error."
     });
   }
-    }
+}
