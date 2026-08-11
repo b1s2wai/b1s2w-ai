@@ -21,7 +21,7 @@ body{
 .container{
   width:92%;
   max-width:850px;
-  margin:30px auto;
+  margin:25px auto;
 }
 
 .header{
@@ -63,8 +63,12 @@ select{
   color:white;
 }
 
+input[type="file"]{
+  padding:10px;
+}
+
 textarea{
-  min-height:120px;
+  min-height:140px;
   resize:vertical;
 }
 
@@ -89,21 +93,13 @@ button:disabled{
   cursor:not-allowed;
 }
 
-.answer,
-.video-result{
+.answer{
   margin-top:18px;
   background:#111827;
   padding:15px;
   border-radius:10px;
   min-height:70px;
   white-space:pre-wrap;
-  word-break:break-word;
-}
-
-.video-options{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:15px;
 }
 
 .status{
@@ -112,16 +108,21 @@ button:disabled{
   white-space:pre-wrap;
 }
 
-.copy-button{
-  background:#2563eb;
+.video-preview{
+  width:100%;
+  margin-top:15px;
+  border-radius:12px;
+  display:none;
 }
 
-.copy-button:hover{
-  background:#1d4ed8;
+.language-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:15px;
 }
 
 @media(max-width:600px){
-  .video-options{
+  .language-grid{
     grid-template-columns:1fr;
   }
 }
@@ -134,7 +135,7 @@ button:disabled{
 
   <div class="header">
     <h1>🤖 B1S2W AI</h1>
-    <p>AI Assistant & Video Prompt Creator</p>
+    <p>AI Assistant & Video Language Converter</p>
   </div>
 
 
@@ -151,45 +152,62 @@ button:disabled{
       autocomplete="off"
     >
 
-    <button
-      id="sendButton"
-      onclick="askAI()">
+    <button id="sendButton" onclick="askAI()">
       Send
     </button>
 
-    <div
-      id="answer"
-      class="answer">
-    </div>
+    <div id="answer" class="answer"></div>
 
   </div>
 
 
-  <!-- VIDEO PROMPT CREATOR -->
+  <!-- VIDEO LANGUAGE CONVERTER -->
 
   <div class="card">
 
-    <h2>🎬 Video Generator</h2>
+    <h2>🎬 Video Language Converter</h2>
 
-    <textarea
-      id="videoPrompt"
-      placeholder="Describe the video you want to create..."
-    ></textarea>
+    <p style="color:#9ca3af;">
+      Upload a video and choose the language you want.
+    </p>
+
+    <input
+      id="videoFile"
+      type="file"
+      accept="video/*"
+      onchange="previewVideo()"
+    >
+
+    <video
+      id="videoPreview"
+      class="video-preview"
+      controls
+    ></video>
 
 
-    <div class="video-options">
+    <div class="language-grid">
 
       <div>
 
-        <label>Video Style</label>
+        <label>Original Language</label>
 
-        <select id="videoStyle">
+        <select id="originalLanguage">
 
-          <option>Anime</option>
-          <option>Cinematic</option>
-          <option>Realistic</option>
-          <option>3D Animation</option>
-          <option>Cartoon</option>
+          <option value="auto">
+            Auto Detect
+          </option>
+
+          <option value="bengali">
+            বাংলা
+          </option>
+
+          <option value="hindi">
+            हिन्दी
+          </option>
+
+          <option value="english">
+            English
+          </option>
 
         </select>
 
@@ -198,14 +216,21 @@ button:disabled{
 
       <div>
 
-        <label>Duration</label>
+        <label>Translate To</label>
 
-        <select id="videoDuration">
+        <select id="targetLanguage">
 
-          <option>5 seconds</option>
-          <option>10 seconds</option>
-          <option>15 seconds</option>
-          <option>30 seconds</option>
+          <option value="bengali">
+            বাংলা
+          </option>
+
+          <option value="hindi">
+            हिन्दी
+          </option>
+
+          <option value="english">
+            English
+          </option>
 
         </select>
 
@@ -214,32 +239,28 @@ button:disabled{
     </div>
 
 
-    <button onclick="generateVideoPrompt()">
-      ✨ Create Video Prompt
+    <button
+      id="translateButton"
+      onclick="translateVideo()"
+    >
+      🌐 Translate Video
     </button>
 
 
     <div
       id="videoStatus"
-      class="status">
-    </div>
+      class="status"
+    ></div>
 
 
-    <div
-      id="videoResult"
-      class="video-result">
-    </div>
+    <h3 style="margin-top:25px;">
+      📝 Translation
+    </h3>
 
-
-    <button
-      id="copyButton"
-      class="copy-button"
-      onclick="copyVideoPrompt()"
-      style="display:none;">
-
-      📋 Copy Prompt
-
-    </button>
+    <textarea
+      id="translation"
+      placeholder="Translated text will appear here..."
+    ></textarea>
 
   </div>
 
@@ -249,17 +270,15 @@ button:disabled{
 <script>
 
 
-/* =========================
-   AI CHAT
-========================= */
+// ===============================
+// AI CHAT
+// ===============================
 
 async function askAI(){
 
   const question =
-    document
-      .getElementById("question")
-      .value
-      .trim();
+    document.getElementById("question")
+    .value.trim();
 
   const answer =
     document.getElementById("answer");
@@ -291,7 +310,8 @@ async function askAI(){
         method:"POST",
 
         headers:{
-          "Content-Type":"application/json"
+          "Content-Type":
+            "application/json"
         },
 
         body:JSON.stringify({
@@ -336,147 +356,185 @@ async function askAI(){
 
 
 
-/* =========================
-   VIDEO PROMPT CREATOR
-========================= */
+// ===============================
+// VIDEO PREVIEW
+// ===============================
 
-function generateVideoPrompt(){
+function previewVideo(){
 
-  const prompt =
-    document
-      .getElementById("videoPrompt")
-      .value
-      .trim();
+  const file =
+    document.getElementById(
+      "videoFile"
+    ).files[0];
 
-
-  const style =
-    document
-      .getElementById("videoStyle")
-      .value;
+  const video =
+    document.getElementById(
+      "videoPreview"
+    );
 
 
-  const duration =
-    document
-      .getElementById("videoDuration")
-      .value;
+  if(!file){
 
-
-  const status =
-    document
-      .getElementById("videoStatus");
-
-
-  const result =
-    document
-      .getElementById("videoResult");
-
-
-  const copyButton =
-    document
-      .getElementById("copyButton");
-
-
-  if(!prompt){
-
-    status.textContent =
-      "⚠️ Please describe the video first.";
-
-    result.textContent = "";
-
-    copyButton.style.display =
+    video.style.display =
       "none";
 
     return;
-
   }
 
 
-  status.textContent =
-    "✨ Creating your video prompt...";
+  const url =
+    URL.createObjectURL(file);
 
 
-  const finalPrompt =
+  video.src = url;
 
-`Create a ${duration} high-quality ${style} video.
-
-SUBJECT:
-${prompt}
-
-VISUAL STYLE:
-High-quality cinematic ${style} animation, detailed environment, expressive characters, natural movement, consistent character appearance, beautiful lighting, rich atmosphere and professional visual composition.
-
-CAMERA:
-Smooth cinematic camera movement, natural tracking, stable framing, realistic depth and subtle parallax.
-
-ANIMATION:
-Fluid motion, natural body movement, realistic hair and clothing movement, consistent lighting and character proportions.
-
-LIGHTING:
-Cinematic lighting with detailed shadows, atmospheric depth and visually appealing highlights.
-
-MOOD:
-Immersive, emotional and cinematic.
-
-QUALITY:
-High detail, clean animation, smooth motion, professional composition, no random text, no watermark, no distorted faces, no extra limbs.`;
-
-
-  result.textContent =
-    finalPrompt;
-
-
-  copyButton.style.display =
+  video.style.display =
     "block";
-
-
-  status.textContent =
-    "✅ Video prompt ready!";
-
 
 }
 
 
 
-/* =========================
-   COPY VIDEO PROMPT
-========================= */
+// ===============================
+// VIDEO TRANSLATOR
+// ===============================
 
-async function copyVideoPrompt(){
+async function translateVideo(){
 
-  const result =
-    document
-      .getElementById("videoResult");
+  const file =
+    document.getElementById(
+      "videoFile"
+    ).files[0];
+
+  const original =
+    document.getElementById(
+      "originalLanguage"
+    ).value;
+
+  const target =
+    document.getElementById(
+      "targetLanguage"
+    ).value;
+
+  const status =
+    document.getElementById(
+      "videoStatus"
+    );
+
+  const translation =
+    document.getElementById(
+      "translation"
+    );
+
+  const button =
+    document.getElementById(
+      "translateButton"
+    );
 
 
-  const text =
-    result.textContent;
+  if(!file){
 
-
-  if(!text){
+    status.textContent =
+      "❌ আগে একটি ভিডিও Upload করো।";
 
     return;
-
   }
+
+
+  if(original === target){
+
+    status.textContent =
+      "❌ Original language এবং Target language একই।";
+
+    return;
+  }
+
+
+  button.disabled = true;
+
+  translation.value = "";
+
+  status.textContent =
+    "⏳ Video selected.\n\n" +
+    "Next step: extracting the speech from the video...";
 
 
   try{
 
-    await navigator.clipboard.writeText(
-      text
-    );
+    /*
+      IMPORTANT:
+
+      এই জায়গায় পরের ধাপে
+      Video → Audio → Speech-to-Text
+      API যুক্ত করা হবে।
+
+      এখন আমরা test করার জন্য
+      একটি sample request পাঠাচ্ছি।
+    */
 
 
-    document
-      .getElementById("videoStatus")
-      .textContent =
-      "✅ Prompt copied!";
+    const question =
+      `I want to translate a video.
+
+Original language:
+${original}
+
+Target language:
+${target}
+
+Please explain the translation workflow and prepare the translated text format.`;
+
+
+
+    const response =
+      await fetch("/api/chat",{
+
+        method:"POST",
+
+        headers:{
+          "Content-Type":
+            "application/json"
+        },
+
+        body:JSON.stringify({
+          question:question
+        })
+
+      });
+
+
+    const data =
+      await response.json();
+
+
+    if(!response.ok){
+
+      throw new Error(
+        data.error ||
+        "Translation request failed."
+      );
+
+    }
+
+
+    translation.value =
+      data.answer;
+
+
+    status.textContent =
+      "✅ Translation system connected.\n\n" +
+      "⚠️ Actual video speech extraction এখনো connect করা হয়নি।";
+
 
   }catch(error){
 
-    document
-      .getElementById("videoStatus")
-      .textContent =
-      "⚠️ Copy failed. Please copy the prompt manually.";
+    status.textContent =
+      "❌ Error: " +
+      error.message;
+
+  }finally{
+
+    button.disabled = false;
 
   }
 
