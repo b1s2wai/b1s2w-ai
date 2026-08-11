@@ -40,35 +40,33 @@ export default async function handler(req, res) {
     }
 
     const instruction = `
-You are the B1S2W AI Video Translation System.
+You are the B1S2W AI Video Dialogue Analyzer.
 
-Analyze the entire uploaded video, including its audio and visual content.
+Analyze the entire uploaded video, including audio and visual content.
 
-The video may contain MULTIPLE CHARACTERS / SPEAKERS.
+The video can contain multiple characters or speakers.
 
-Your most important task is to separate the dialogue of different speakers.
+Your job is to create a dialogue timeline.
 
-RULES:
+IMPORTANT RULES:
 
 1. Detect the spoken language.
-2. Transcribe ALL spoken dialogue in chronological order.
-3. Identify different speakers whenever possible.
-4. NEVER merge dialogue from different speakers into one paragraph.
-5. If two characters are speaking, use Character 1 and Character 2.
-6. If three characters are speaking, use Character 1, Character 2 and Character 3.
-7. Continue this for additional speakers.
-8. Keep the same speaker label whenever that speaker talks again.
-9. If the actual character name is clearly known from the video, you may use that name.
-10. If the name is not known, use Character 1, Character 2, etc.
-11. Preserve the order in which people speak.
-12. Do not invent dialogue.
-13. Do not remove short dialogue such as "हाँ", "क्या?", "नहीं", etc.
-14. If two speakers talk very close together, still try to separate their lines.
-15. Translate EVERY dialogue line into the selected target language.
-16. Preserve the emotion and natural meaning.
-17. Do not summarize the dialogue.
-18. Do not merge multiple speakers into one speaker.
-19. Return ONLY JSON.
+2. Transcribe every spoken dialogue.
+3. Separate different speakers.
+4. Keep dialogue in chronological order.
+5. Do NOT merge different speakers.
+6. Use Character 1, Character 2, Character 3, etc. when names are unknown.
+7. Keep the same character number for the same speaker throughout the video.
+8. Estimate the start and end timestamp of every dialogue line.
+9. Use MM:SS format.
+10. Preserve very short dialogue such as "Yes", "No", "What?", etc.
+11. Translate every dialogue line into the target language.
+12. Preserve emotion and natural meaning.
+13. Do not summarize.
+14. Do not invent dialogue.
+15. Use the visual appearance of characters when useful for distinguishing speakers.
+16. If exact timing is uncertain, provide the best reasonable timestamp estimate.
+17. Return ONLY valid JSON.
 
 Original language:
 ${originalLanguage || "Auto Detect"}
@@ -76,28 +74,24 @@ ${originalLanguage || "Auto Detect"}
 Target language:
 ${targetLanguage}
 
-Return EXACTLY this structure:
+Return exactly:
 
 {
   "detectedLanguage": "Japanese",
-  "speakers": [
+  "dialogues": [
     {
       "speaker": "Character 1",
-      "lines": [
-        {
-          "transcript": "Original dialogue",
-          "translation": "Translated dialogue"
-        }
-      ]
+      "startTime": "00:00",
+      "endTime": "00:03",
+      "transcript": "Original dialogue",
+      "translation": "Translated dialogue"
     },
     {
       "speaker": "Character 2",
-      "lines": [
-        {
-          "transcript": "Original dialogue",
-          "translation": "Translated dialogue"
-        }
-      ]
+      "startTime": "00:03",
+      "endTime": "00:06",
+      "transcript": "Original dialogue",
+      "translation": "Translated dialogue"
     }
   ]
 }
@@ -131,64 +125,7 @@ Return EXACTLY this structure:
           ],
 
           generationConfig: {
-            responseMimeType: "application/json",
-
-            responseSchema: {
-              type: "object",
-
-              properties: {
-                detectedLanguage: {
-                  type: "string"
-                },
-
-                speakers: {
-                  type: "array",
-
-                  items: {
-                    type: "object",
-
-                    properties: {
-                      speaker: {
-                        type: "string"
-                      },
-
-                      lines: {
-                        type: "array",
-
-                        items: {
-                          type: "object",
-
-                          properties: {
-                            transcript: {
-                              type: "string"
-                            },
-
-                            translation: {
-                              type: "string"
-                            }
-                          },
-
-                          required: [
-                            "transcript",
-                            "translation"
-                          ]
-                        }
-                      }
-                    },
-
-                    required: [
-                      "speaker",
-                      "lines"
-                    ]
-                  }
-                }
-              },
-
-              required: [
-                "detectedLanguage",
-                "speakers"
-              ]
-            }
+            responseMimeType: "application/json"
           }
         })
       }
@@ -200,7 +137,7 @@ Return EXACTLY this structure:
       return res.status(response.status).json({
         error:
           data?.error?.message ||
-          "Gemini video translation request failed."
+          "Gemini video analysis failed."
       });
     }
 
@@ -209,7 +146,7 @@ Return EXACTLY this structure:
 
     if (!resultText) {
       return res.status(500).json({
-        error: "Gemini returned no translation."
+        error: "Gemini returned no dialogue."
       });
     }
 
@@ -227,9 +164,9 @@ Return EXACTLY this structure:
       detectedLanguage:
         result.detectedLanguage || "",
 
-      speakers:
-        Array.isArray(result.speakers)
-          ? result.speakers
+      dialogues:
+        Array.isArray(result.dialogues)
+          ? result.dialogues
           : []
     });
 
@@ -240,4 +177,4 @@ Return EXACTLY this structure:
         "Server error."
     });
   }
-}
+    }
