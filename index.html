@@ -152,11 +152,7 @@ button:disabled{
   font-size:13px;
 }
 
-.voice-row{
-  margin-top:12px;
-}
-
-.preview-button{
+.edit-button{
   background:#2563eb;
 }
 
@@ -164,8 +160,8 @@ button:disabled{
   background:#9333ea;
 }
 
-.stop-button{
-  background:#dc2626;
+.voice-row{
+  margin-top:12px;
 }
 
 .empty{
@@ -194,16 +190,15 @@ button:disabled{
 
 <div class="header">
 <h1>🤖 B1S2W AI</h1>
-<p>🎬 AI Video Language Converter & Dialogue Timeline</p>
+<p>🎬 AI Video Language Converter & Multi-Character Dialogue</p>
 </div>
-
 
 <div class="card">
 
 <h2>🎬 Video Language Converter</h2>
 
 <p style="color:#9ca3af;">
-ভিডিও Upload করো এবং dialogue আলাদা করে translation তৈরি করো।
+ভিডিও Upload করো এবং সব Character-এর dialogue আলাদা করে translation তৈরি করো।
 </p>
 
 <input
@@ -218,7 +213,6 @@ id="videoPreview"
 class="video-preview"
 controls
 ></video>
-
 
 <div class="language-grid">
 
@@ -259,7 +253,6 @@ controls
 
 </div>
 
-
 <div>
 
 <label>Translate To</label>
@@ -298,7 +291,6 @@ controls
 
 </div>
 
-
 <button
 id="translateButton"
 onclick="translateVideo()"
@@ -320,7 +312,7 @@ style="display:none;"
 <h2>🎬 Dialogue Timeline</h2>
 
 <p style="color:#9ca3af;">
-প্রতিটি চরিত্রের dialogue, সময় এবং Voice আলাদাভাবে edit করতে পারবে।
+প্রতিটি Character-এর dialogue, timing এবং আলাদা Voice নির্বাচন করতে পারবে।
 </p>
 
 <div id="detectedLanguage"></div>
@@ -346,26 +338,26 @@ let dialogueData = [];
 
 function previewVideo(){
 
-  const file =
-    document.getElementById("videoFile").files[0];
+const file =
+document.getElementById("videoFile").files[0];
 
-  const video =
-    document.getElementById("videoPreview");
+const video =
+document.getElementById("videoPreview");
 
-  if(!file){
+if(!file){
 
-    video.style.display="none";
-    video.removeAttribute("src");
+video.style.display="none";
+return;
 
-    return;
-  }
+}
 
-  const url =
-    URL.createObjectURL(file);
+const url =
+URL.createObjectURL(file);
 
-  video.src=url;
+video.src=url;
 
-  video.style.display="block";
+video.style.display="block";
+
 }
 
 
@@ -375,165 +367,164 @@ function previewVideo(){
 
 async function translateVideo(){
 
-  const file =
-    document.getElementById("videoFile").files[0];
+const file =
+document.getElementById("videoFile").files[0];
 
-  const original =
-    document.getElementById("originalLanguage").value;
+const original =
+document.getElementById("originalLanguage").value;
 
-  const target =
-    document.getElementById("targetLanguage").value;
+const target =
+document.getElementById("targetLanguage").value;
 
-  const status =
-    document.getElementById("videoStatus");
+const status =
+document.getElementById("videoStatus");
 
-  const button =
-    document.getElementById("translateButton");
+const button =
+document.getElementById("translateButton");
 
-  const timelineCard =
-    document.getElementById("timelineCard");
+const timelineCard =
+document.getElementById("timelineCard");
 
 
-  if(!file){
+if(!file){
 
-    status.textContent =
-      "❌ আগে একটি ভিডিও Upload করো।";
+status.textContent =
+"❌ আগে একটি ভিডিও Upload করো।";
 
-    return;
-  }
+return;
 
+}
 
-  if(original === target){
 
-    status.textContent =
-      "❌ Original Language এবং Translate To একই হতে পারবে না।";
+if(original === target){
 
-    return;
-  }
+status.textContent =
+"❌ Original Language এবং Translate To একই হতে পারবে না।";
 
+return;
 
-  button.disabled=true;
+}
 
-  timelineCard.style.display="none";
 
-  status.textContent =
-    "⏳ Video AI-তে পাঠানো হচ্ছে...";
+button.disabled=true;
 
+timelineCard.style.display="none";
 
-  try{
+status.textContent =
+"⏳ Video AI-তে পাঠানো হচ্ছে...";
 
-    const arrayBuffer =
-      await file.arrayBuffer();
 
-    const bytes =
-      new Uint8Array(arrayBuffer);
+try{
 
-    let binary="";
+const arrayBuffer =
+await file.arrayBuffer();
 
-    const chunkSize=0x8000;
+const bytes =
+new Uint8Array(arrayBuffer);
 
+let binary="";
 
-    for(
-      let i=0;
-      i<bytes.length;
-      i+=chunkSize
-    ){
+const chunkSize=0x8000;
 
-      binary += String.fromCharCode(
-        ...bytes.subarray(
-          i,
-          Math.min(i+chunkSize,bytes.length)
-        )
-      );
+for(
+let i=0;
+i<bytes.length;
+i+=chunkSize
+){
 
-    }
+binary += String.fromCharCode(
+...bytes.subarray(
+i,
+Math.min(i+chunkSize,bytes.length)
+)
+);
 
+}
 
-    const videoBase64 =
-      btoa(binary);
+const videoBase64 =
+btoa(binary);
 
 
-    status.textContent =
-      "🤖 AI ভিডিও বিশ্লেষণ করছে...\n\n" +
-      "👥 Speakers শনাক্ত করা হচ্ছে...\n" +
-      "⏱ Dialogue timing বের করা হচ্ছে...\n" +
-      "🌐 Translation তৈরি হচ্ছে...";
+status.textContent =
+"🤖 AI ভিডিও বিশ্লেষণ করছে...\n\n" +
+"👥 সব Speaker শনাক্ত করা হচ্ছে...\n" +
+"⏱ Dialogue timing বের করা হচ্ছে...\n" +
+"🌐 Translation তৈরি হচ্ছে...";
 
 
-    const response =
-      await fetch("/api/translate-video",{
+const response =
+await fetch("/api/translate-video",{
 
-        method:"POST",
+method:"POST",
 
-        headers:{
-          "Content-Type":"application/json"
-        },
+headers:{
+"Content-Type":"application/json"
+},
 
-        body:JSON.stringify({
+body:JSON.stringify({
 
-          videoBase64:videoBase64,
+videoBase64:videoBase64,
 
-          mimeType:file.type,
+mimeType:file.type,
 
-          originalLanguage:original,
+originalLanguage:original,
 
-          targetLanguage:target
+targetLanguage:target
 
-        })
+})
 
-      });
+});
 
 
-    const data =
-      await response.json();
+const data =
+await response.json();
 
 
-    if(!response.ok){
+if(!response.ok){
 
-      throw new Error(
-        data.error ||
-        "Translation failed."
-      );
+throw new Error(
+data.error ||
+"Translation failed."
+);
 
-    }
+}
 
 
-    dialogueData =
-      Array.isArray(data.dialogues)
-      ? data.dialogues
-      : [];
+dialogueData =
+Array.isArray(data.dialogues)
+? data.dialogues
+: [];
 
 
-    document.getElementById(
-      "detectedLanguage"
-    ).innerHTML =
-      "<b>🔎 Detected Language:</b> " +
-      escapeHtml(
-        data.detectedLanguage || "Unknown"
-      );
+document.getElementById(
+"detectedLanguage"
+).innerHTML =
+"<b>🔎 Detected Language:</b> " +
+escapeHtml(
+data.detectedLanguage || "Unknown"
+);
 
 
-    renderTimeline();
+renderTimeline();
 
+timelineCard.style.display="block";
 
-    timelineCard.style.display="block";
 
+status.textContent =
+"✅ Multi-Character dialogue analysis complete!";
 
-    status.textContent =
-      "✅ Dialogue analysis complete!";
 
+}catch(error){
 
-  }catch(error){
+status.textContent =
+"❌ Error:\n" +
+error.message;
 
-    status.textContent =
-      "❌ Error:\n" +
-      error.message;
+}finally{
 
-  }finally{
+button.disabled=false;
 
-    button.disabled=false;
-
-  }
+}
 
 }
 
@@ -544,196 +535,153 @@ async function translateVideo(){
 
 function renderTimeline(){
 
-  const container =
-    document.getElementById(
-      "dialogueTimeline"
-    );
+const container =
+document.getElementById(
+"dialogueTimeline"
+);
 
-  container.innerHTML="";
-
-
-  if(!dialogueData.length){
-
-    container.innerHTML =
-      '<div class="empty">' +
-      'কোনো dialogue পাওয়া যায়নি।' +
-      '</div>';
-
-    return;
-  }
+container.innerHTML="";
 
 
-  dialogueData.forEach(
-    (item,index)=>{
+if(!dialogueData.length){
 
-      const card =
-        document.createElement("div");
+container.innerHTML =
+'<div class="empty">' +
+'কোনো dialogue পাওয়া যায়নি।' +
+'</div>';
 
-      card.className =
-        "dialogue-card";
+return;
 
-
-      card.innerHTML = `
-
-        <div class="dialogue-header">
-
-          <div class="speaker">
-            👤 ${escapeHtml(
-              item.speaker ||
-              "Character"
-            )}
-          </div>
-
-          <div class="time">
-            ⏱ ${escapeHtml(
-              item.startTime ||
-              "00:00"
-            )}
-            →
-            ${escapeHtml(
-              item.endTime ||
-              "00:00"
-            )}
-          </div>
-
-        </div>
+}
 
 
-        <div class="small-grid">
+dialogueData.forEach(
+(item,index)=>{
 
-          <div>
+const card =
+document.createElement("div");
 
-            <label>
-              Start Time
-            </label>
-
-            <input
-              id="start-${index}"
-              value="${escapeAttr(
-                item.startTime ||
-                "00:00"
-              )}"
-            >
-
-          </div>
+card.className =
+"dialogue-card";
 
 
-          <div>
+card.innerHTML = `
 
-            <label>
-              End Time
-            </label>
+<div class="dialogue-header">
 
-            <input
-              id="end-${index}"
-              value="${escapeAttr(
-                item.endTime ||
-                "00:00"
-              )}"
-            >
+<div class="speaker">
+👤 ${escapeHtml(item.speaker || "Character")}
+</div>
 
-          </div>
+<div class="time">
+⏱ ${escapeHtml(item.startTime || "00:00")}
+→
+${escapeHtml(item.endTime || "00:00")}
+</div>
 
-        </div>
+</div>
 
 
-        <div>
+<div class="small-grid">
 
-          <label>
-            📝 Original Dialogue
-          </label>
+<div>
 
-          <textarea
-            id="original-${index}"
-          >${escapeHtml(
-            item.transcript || ""
-          )}</textarea>
+<label>Start Time</label>
 
-        </div>
+<input
+id="start-${index}"
+value="${escapeAttr(item.startTime || "00:00")}"
+>
 
-
-        <div>
-
-          <label>
-            🌐 Translation
-          </label>
-
-          <textarea
-            id="translation-${index}"
-          >${escapeHtml(
-            item.translation || ""
-          )}</textarea>
-
-        </div>
+</div>
 
 
-        <div class="voice-row">
+<div>
 
-          <label>
-            🎙 Voice
-          </label>
+<label>End Time</label>
 
-          <select id="voice-${index}">
+<input
+id="end-${index}"
+value="${escapeAttr(item.endTime || "00:00")}"
+>
 
-            <option value="voice1">
-              Voice 1 — Male
-            </option>
+</div>
 
-            <option value="voice2">
-              Voice 2 — Female
-            </option>
-
-            <option value="voice3">
-              Voice 3 — Young Male
-            </option>
-
-            <option value="voice4">
-              Voice 4 — Young Female
-            </option>
-
-            <option value="voice5">
-              Voice 5 — Deep Male
-            </option>
-
-            <option value="voice6">
-              Voice 6 — Soft Female
-            </option>
-
-          </select>
-
-        </div>
+</div>
 
 
-        <button
-          class="preview-button"
-          onclick="previewDialogue(${index})"
-        >
-          🔊 Preview Voice
-        </button>
+<div>
+
+<label>📝 Original Dialogue</label>
+
+<textarea
+id="original-${index}"
+>${escapeHtml(item.transcript || "")}</textarea>
+
+</div>
 
 
-        <button
-          class="stop-button"
-          onclick="stopVoice()"
-        >
-          ⏹ Stop Voice
-        </button>
+<div>
+
+<label>🌐 Translation</label>
+
+<textarea
+id="translation-${index}"
+>${escapeHtml(item.translation || "")}</textarea>
+
+</div>
 
 
-        <button
-          class="save-button"
-          onclick="saveDialogue(${index})"
-        >
-          💾 Save Changes
-        </button>
+<div class="voice-row">
 
-      `;
+<label>🎙 Character Voice</label>
+
+<select id="voice-${index}">
+
+<option value="male1">👨 Male 1 — Natural</option>
+
+<option value="male2">👨 Male 2 — Deep</option>
+
+<option value="youngMale">👦 Young Male</option>
+
+<option value="female1">👩 Female 1 — Natural</option>
+
+<option value="female2">👩 Female 2 — Soft</option>
+
+<option value="youngFemale">👧 Young Female</option>
+
+<option value="neutral">🧑 Neutral</option>
+
+<option value="animeMale">🎭 Anime Male</option>
+
+<option value="animeFemale">🎭 Anime Female</option>
+
+</select>
+
+</div>
 
 
-      container.appendChild(card);
+<button
+class="edit-button"
+onclick="previewDialogue(${index})"
+>
+▶️ Preview Dialogue
+</button>
 
-    }
-  );
+
+<button
+class="save-button"
+onclick="saveDialogue(${index})"
+>
+💾 Save Changes
+</button>
+
+`;
+
+
+container.appendChild(card);
+
+});
 
 }
 
@@ -744,52 +692,43 @@ function renderTimeline(){
 
 function saveDialogue(index){
 
-  const item =
-    dialogueData[index];
+const item =
+dialogueData[index];
 
-  if(!item){
-    return;
-  }
-
-
-  item.startTime =
-    document.getElementById(
-      "start-"+index
-    ).value;
+if(!item){
+return;
+}
 
 
-  item.endTime =
-    document.getElementById(
-      "end-"+index
-    ).value;
+item.startTime =
+document.getElementById(
+"start-"+index
+).value;
+
+item.endTime =
+document.getElementById(
+"end-"+index
+).value;
+
+item.transcript =
+document.getElementById(
+"original-"+index
+).value;
+
+item.translation =
+document.getElementById(
+"translation-"+index
+).value;
+
+item.voice =
+document.getElementById(
+"voice-"+index
+).value;
 
 
-  item.transcript =
-    document.getElementById(
-      "original-"+index
-    ).value;
-
-
-  item.translation =
-    document.getElementById(
-      "translation-"+index
-    ).value;
-
-
-  item.voice =
-    document.getElementById(
-      "voice-"+index
-    ).value;
-
-
-  renderTimeline();
-
-
-  alert(
-    "✅ Dialogue " +
-    (index+1) +
-    " saved."
-  );
+alert(
+"✅ Dialogue "+(index+1)+" saved."
+);
 
 }
 
@@ -800,316 +739,128 @@ function saveDialogue(index){
 
 function previewDialogue(index){
 
-  const item =
-    dialogueData[index];
+const item =
+dialogueData[index];
 
-  if(!item){
-    return;
-  }
-
-
-  const translation =
-    document.getElementById(
-      "translation-"+index
-    ).value;
+if(!item){
+return;
+}
 
 
-  if(!translation.trim()){
-
-    alert(
-      "❌ Translation text পাওয়া যায়নি।"
-    );
-
-    return;
-  }
+const video =
+document.getElementById(
+"videoPreview"
+);
 
 
-  const video =
-    document.getElementById(
-      "videoPreview"
-    );
+const time =
+parseTime(item.startTime);
 
 
-  const startTime =
-    document.getElementById(
-      "start-"+index
-    ).value;
+if(!isNaN(time)){
+
+video.currentTime=time;
+
+video.play();
+
+}
 
 
-  const seconds =
-    parseTime(startTime);
+const selectedVoice =
+document.getElementById(
+"voice-"+index
+).value;
 
 
-  if(!isNaN(seconds)){
-
-    video.currentTime =
-      seconds;
-
-  }
-
-
-  const selectedVoice =
-    document.getElementById(
-      "voice-"+index
-    ).value;
+const voiceName =
+document.getElementById(
+"voice-"+index
+)
+.options[
+document.getElementById(
+"voice-"+index
+).selectedIndex
+].text;
 
 
-  const utterance =
-    new SpeechSynthesisUtterance(
-      translation
-    );
-
-
-  const target =
-    document.getElementById(
-      "targetLanguage"
-    ).value;
-
-
-  utterance.lang =
-    getSpeechLanguage(target);
-
-
-  /*
-    Voice personality.
-    These settings create different
-    voice styles where the device
-    supports them.
-  */
-
-  if(selectedVoice === "voice1"){
-
-    utterance.pitch=0.9;
-    utterance.rate=1.0;
-
-  }
-
-  else if(selectedVoice === "voice2"){
-
-    utterance.pitch=1.2;
-    utterance.rate=1.0;
-
-  }
-
-  else if(selectedVoice === "voice3"){
-
-    utterance.pitch=1.15;
-    utterance.rate=1.05;
-
-  }
-
-  else if(selectedVoice === "voice4"){
-
-    utterance.pitch=1.35;
-    utterance.rate=1.05;
-
-  }
-
-  else if(selectedVoice === "voice5"){
-
-    utterance.pitch=0.7;
-    utterance.rate=0.95;
-
-  }
-
-  else if(selectedVoice === "voice6"){
-
-    utterance.pitch=1.15;
-    utterance.rate=0.9;
-
-  }
-
-
-  /*
-    Try to find a matching
-    language voice installed
-    on the device.
-  */
-
-  const voices =
-    window.speechSynthesis
-    .getVoices();
-
-
-  const matchingVoice =
-    voices.find(
-      voice =>
-        voice.lang
-        .toLowerCase()
-        .startsWith(
-          utterance.lang
-          .toLowerCase()
-        )
-    );
-
-
-  if(matchingVoice){
-
-    utterance.voice =
-      matchingVoice;
-
-  }
-
-
-  window.speechSynthesis.cancel();
-
-  window.speechSynthesis.speak(
-    utterance
-  );
+alert(
+"🎙 Selected Voice:\n" +
+voiceName +
+"\n\n" +
+"Character:\n" +
+(item.speaker || "Character") +
+"\n\n" +
+"Dialogue:\n" +
+(item.translation || "")
+);
 
 }
 
 
 /* =========================
-   STOP VOICE
-========================= */
-
-function stopVoice(){
-
-  window.speechSynthesis.cancel();
-
-}
-
-
-/* =========================
-   LANGUAGE
-========================= */
-
-function getSpeechLanguage(
-  language
-){
-
-  const languages = {
-
-    bengali:"bn-IN",
-    hindi:"hi-IN",
-    english:"en-US",
-    japanese:"ja-JP",
-    korean:"ko-KR",
-    chinese:"zh-CN",
-    spanish:"es-ES",
-    french:"fr-FR",
-    german:"de-DE",
-    arabic:"ar-SA",
-    portuguese:"pt-PT",
-    russian:"ru-RU",
-    italian:"it-IT",
-    turkish:"tr-TR",
-    vietnamese:"vi-VN",
-    thai:"th-TH",
-    indonesian:"id-ID",
-    urdu:"ur-PK",
-    tamil:"ta-IN",
-    telugu:"te-IN",
-    marathi:"mr-IN",
-    gujarati:"gu-IN",
-    punjabi:"pa-IN",
-    malayalam:"ml-IN",
-    nepali:"ne-NP"
-
-  };
-
-
-  return languages[language]
-    || "en-US";
-
-}
-
-
-/* =========================
-   TIME
+   TIME PARSER
 ========================= */
 
 function parseTime(value){
 
-  if(!value){
-    return NaN;
-  }
+if(!value){
+return NaN;
+}
 
 
-  const parts =
-    value.split(":");
+const parts =
+value.split(":");
+
+if(parts.length!==2){
+return NaN;
+}
 
 
-  if(parts.length!==2){
-    return NaN;
-  }
+const minutes =
+parseInt(parts[0],10);
+
+const seconds =
+parseFloat(parts[1]);
 
 
-  const minutes =
-    parseInt(
-      parts[0],
-      10
-    );
+if(
+isNaN(minutes) ||
+isNaN(seconds)
+){
+
+return NaN;
+
+}
 
 
-  const seconds =
-    parseFloat(
-      parts[1]
-    );
-
-
-  if(
-    isNaN(minutes) ||
-    isNaN(seconds)
-  ){
-
-    return NaN;
-
-  }
-
-
-  return (
-    minutes * 60 +
-    seconds
-  );
+return minutes*60+seconds;
 
 }
 
 
 /* =========================
-   SECURITY
+   SECURITY HELPERS
 ========================= */
 
 function escapeHtml(value){
 
-  return String(value)
-
-    .replace(
-      /&/g,
-      "&amp;"
-    )
-
-    .replace(
-      /</g,
-      "&lt;"
-    )
-
-    .replace(
-      />/g,
-      "&gt;"
-    )
-
-    .replace(
-      /"/g,
-      "&quot;"
-    )
-
-    .replace(
-      /'/g,
-      "&#039;"
-    );
+return String(value)
+.replace(/&/g,"&amp;")
+.replace(/</g,"&lt;")
+.replace(/>/g,"&gt;")
+.replace(/"/g,"&quot;")
+.replace(/'/g,"&#039;");
 
 }
 
 
 function escapeAttr(value){
 
-  return escapeHtml(value);
+return escapeHtml(value);
 
 }
 
 </script>
 
 </body>
-</html>
+  </html>
