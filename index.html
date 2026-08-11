@@ -32,7 +32,6 @@ body{
 .header h1{
   margin:0;
   color:#00ff99;
-  font-size:32px;
 }
 
 .header p{
@@ -69,14 +68,14 @@ input[type="file"]{
 }
 
 textarea{
-  min-height:150px;
+  min-height:140px;
   resize:vertical;
 }
 
 button{
   width:100%;
   margin-top:15px;
-  padding:14px;
+  padding:13px;
   border:none;
   border-radius:10px;
   background:#00cc66;
@@ -85,28 +84,9 @@ button{
   cursor:pointer;
 }
 
-button:hover{
-  background:#00b359;
-}
-
 button:disabled{
   opacity:.6;
   cursor:not-allowed;
-}
-
-.answer,
-.result-box{
-  margin-top:18px;
-  background:#111827;
-  padding:15px;
-  border-radius:10px;
-  white-space:pre-wrap;
-}
-
-.status{
-  margin-top:15px;
-  color:#9ca3af;
-  white-space:pre-wrap;
 }
 
 .video-preview{
@@ -114,7 +94,6 @@ button:disabled{
   margin-top:15px;
   border-radius:12px;
   display:none;
-  max-height:500px;
 }
 
 .language-grid{
@@ -124,31 +103,26 @@ button:disabled{
   margin-top:15px;
 }
 
-label{
-  display:block;
-  margin-top:8px;
-  color:#d1d5db;
+.status{
+  margin-top:15px;
+  color:#9ca3af;
+  white-space:pre-wrap;
 }
 
-.detected{
-  color:#00ff99;
-  font-size:18px;
+.result{
+  margin-top:20px;
+  background:#111827;
+  padding:15px;
+  border-radius:12px;
+}
+
+.result textarea{
   margin-top:10px;
-}
-
-.result-title{
-  font-size:22px;
-  font-weight:bold;
-  margin-bottom:10px;
 }
 
 @media(max-width:600px){
   .language-grid{
     grid-template-columns:1fr;
-  }
-
-  .header h1{
-    font-size:28px;
   }
 }
 </style>
@@ -160,43 +134,16 @@ label{
 
 <div class="header">
 <h1>🤖 B1S2W AI</h1>
-<p>AI Assistant & Video Language Converter</p>
+<p>🎬 AI Video Language Converter</p>
 </div>
-
-
-<!-- ================= AI CHAT ================= -->
-
-<div class="card">
-
-<h2>💬 AI Chat</h2>
-
-<input
-id="question"
-type="text"
-placeholder="Ask me anything..."
-autocomplete="off"
->
-
-<button id="sendButton" onclick="askAI()">
-Send
-</button>
-
-<div id="answer" class="answer">
-</div>
-
-</div>
-
-
-<!-- ================= VIDEO TRANSLATOR ================= -->
 
 <div class="card">
 
 <h2>🎬 Video Language Converter</h2>
 
 <p style="color:#9ca3af;">
-ভিডিও Upload করে যেকোনো ভাষার spoken dialogue অন্য ভাষায় অনুবাদ করো।
+ভিডিও Upload করো এবং যেকোনো ভাষায় অনুবাদ করো।
 </p>
-
 
 <input
 id="videoFile"
@@ -205,13 +152,11 @@ accept="video/*"
 onchange="previewVideo()"
 >
 
-
 <video
 id="videoPreview"
 class="video-preview"
 controls
 ></video>
-
 
 <div class="language-grid">
 
@@ -225,65 +170,33 @@ controls
 
 <option value="bengali">🇧🇩 বাংলা</option>
 <option value="hindi">🇮🇳 हिन्दी</option>
-<option value="english">🇬🇧 English</option>
+<option value="english">🇺🇸 English</option>
 <option value="japanese">🇯🇵 日本語</option>
 <option value="korean">🇰🇷 한국어</option>
 <option value="chinese">🇨🇳 中文</option>
-<option value="arabic">🇸🇦 العربية</option>
 <option value="spanish">🇪🇸 Español</option>
 <option value="french">🇫🇷 Français</option>
 <option value="german">🇩🇪 Deutsch</option>
-<option value="italian">🇮🇹 Italiano</option>
+<option value="arabic">🇸🇦 العربية</option>
 <option value="portuguese">🇵🇹 Português</option>
 <option value="russian">🇷🇺 Русский</option>
-<option value="ukrainian">🇺🇦 Українська</option>
+<option value="italian">🇮🇹 Italiano</option>
 <option value="turkish">🇹🇷 Türkçe</option>
-<option value="dutch">🇳🇱 Nederlands</option>
-<option value="polish">🇵🇱 Polski</option>
-<option value="swedish">🇸🇪 Svenska</option>
-<option value="norwegian">🇳🇴 Norsk</option>
-<option value="danish">🇩🇰 Dansk</option>
-<option value="finnish">🇫🇮 Suomi</option>
-<option value="greek">🇬🇷 Ελληνικά</option>
-<option value="hebrew">🇮🇱 עברית</option>
-<option value="persian">🇮🇷 فارسی</option>
+<option value="vietnamese">🇻🇳 Tiếng Việt</option>
+<option value="thai">🇹🇭 ไทย</option>
+<option value="indonesian">🇮🇩 Bahasa Indonesia</option>
 <option value="urdu">🇵🇰 اردو</option>
 <option value="tamil">🇮🇳 தமிழ்</option>
 <option value="telugu">🇮🇳 తెలుగు</option>
-<option value="kannada">🇮🇳 ಕನ್ನಡ</option>
-<option value="malayalam">🇮🇳 മലയാളം</option>
 <option value="marathi">🇮🇳 मराठी</option>
 <option value="gujarati">🇮🇳 ગુજરાતી</option>
 <option value="punjabi">🇮🇳 ਪੰਜਾਬੀ</option>
+<option value="malayalam">🇮🇳 മലയാളം</option>
 <option value="nepali">🇳🇵 नेपाली</option>
-<option value="sinhala">🇱🇰 සිංහල</option>
-<option value="thai">🇹🇭 ไทย</option>
-<option value="vietnamese">🇻🇳 Tiếng Việt</option>
-<option value="indonesian">🇮🇩 Bahasa Indonesia</option>
-<option value="malay">🇲🇾 Bahasa Melayu</option>
-<option value="filipino">🇵🇭 Filipino</option>
-<option value="swahili">🇰🇪 Kiswahili</option>
-<option value="afrikaans">🇿🇦 Afrikaans</option>
-<option value="romanian">🇷🇴 Română</option>
-<option value="czech">🇨🇿 Čeština</option>
-<option value="slovak">🇸🇰 Slovenčina</option>
-<option value="hungarian">🇭🇺 Magyar</option>
-<option value="bulgarian">🇧🇬 Български</option>
-<option value="serbian">🇷🇸 Српски</option>
-<option value="croatian">🇭🇷 Hrvatski</option>
-<option value="slovenian">🇸🇮 Slovenščina</option>
-<option value="lithuanian">🇱🇹 Lietuvių</option>
-<option value="latvian">🇱🇻 Latviešu</option>
-<option value="estonian">🇪🇪 Eesti</option>
-<option value="icelandic">🇮🇸 Íslenska</option>
-<option value="albanian">🇦🇱 Shqip</option>
-<option value="armenian">🇦🇲 Հայերեն</option>
-<option value="georgian">🇬🇪 ქართული</option>
 
 </select>
 
 </div>
-
 
 <div>
 
@@ -293,67 +206,35 @@ controls
 
 <option value="bengali">🇧🇩 বাংলা</option>
 <option value="hindi">🇮🇳 हिन्दी</option>
-<option value="english">🇬🇧 English</option>
+<option value="english">🇺🇸 English</option>
 <option value="japanese">🇯🇵 日本語</option>
 <option value="korean">🇰🇷 한국어</option>
 <option value="chinese">🇨🇳 中文</option>
-<option value="arabic">🇸🇦 العربية</option>
 <option value="spanish">🇪🇸 Español</option>
 <option value="french">🇫🇷 Français</option>
 <option value="german">🇩🇪 Deutsch</option>
-<option value="italian">🇮🇹 Italiano</option>
+<option value="arabic">🇸🇦 العربية</option>
 <option value="portuguese">🇵🇹 Português</option>
 <option value="russian">🇷🇺 Русский</option>
-<option value="ukrainian">🇺🇦 Українська</option>
+<option value="italian">🇮🇹 Italiano</option>
 <option value="turkish">🇹🇷 Türkçe</option>
-<option value="dutch">🇳🇱 Nederlands</option>
-<option value="polish">🇵🇱 Polski</option>
-<option value="swedish">🇸🇪 Svenska</option>
-<option value="norwegian">🇳🇴 Norsk</option>
-<option value="danish">🇩🇰 Dansk</option>
-<option value="finnish">🇫🇮 Suomi</option>
-<option value="greek">🇬🇷 Ελληνικά</option>
-<option value="hebrew">🇮🇱 עברית</option>
-<option value="persian">🇮🇷 فارسی</option>
+<option value="vietnamese">🇻🇳 Tiếng Việt</option>
+<option value="thai">🇹🇭 ไทย</option>
+<option value="indonesian">🇮🇩 Bahasa Indonesia</option>
 <option value="urdu">🇵🇰 اردو</option>
 <option value="tamil">🇮🇳 தமிழ்</option>
 <option value="telugu">🇮🇳 తెలుగు</option>
-<option value="kannada">🇮🇳 ಕನ್ನಡ</option>
-<option value="malayalam">🇮🇳 മലയാളം</option>
 <option value="marathi">🇮🇳 मराठी</option>
 <option value="gujarati">🇮🇳 ગુજરાતી</option>
 <option value="punjabi">🇮🇳 ਪੰਜਾਬੀ</option>
+<option value="malayalam">🇮🇳 മലയാളം</option>
 <option value="nepali">🇳🇵 नेपाली</option>
-<option value="sinhala">🇱🇰 සිංහල</option>
-<option value="thai">🇹🇭 ไทย</option>
-<option value="vietnamese">🇻🇳 Tiếng Việt</option>
-<option value="indonesian">🇮🇩 Bahasa Indonesia</option>
-<option value="malay">🇲🇾 Bahasa Melayu</option>
-<option value="filipino">🇵🇭 Filipino</option>
-<option value="swahili">🇰🇪 Kiswahili</option>
-<option value="afrikaans">🇿🇦 Afrikaans</option>
-<option value="romanian">🇷🇴 Română</option>
-<option value="czech">🇨🇿 Čeština</option>
-<option value="slovak">🇸🇰 Slovenčina</option>
-<option value="hungarian">🇭🇺 Magyar</option>
-<option value="bulgarian">🇧🇬 Български</option>
-<option value="serbian">🇷🇸 Српски</option>
-<option value="croatian">🇭🇷 Hrvatski</option>
-<option value="slovenian">🇸🇮 Slovenščina</option>
-<option value="lithuanian">🇱🇹 Lietuvių</option>
-<option value="latvian">🇱🇻 Latviešu</option>
-<option value="estonian">🇪🇪 Eesti</option>
-<option value="icelandic">🇮🇸 Íslenska</option>
-<option value="albanian">🇦🇱 Shqip</option>
-<option value="armenian">🇦🇲 Հայերեն</option>
-<option value="georgian">🇬🇪 ქართული</option>
 
 </select>
 
 </div>
 
 </div>
-
 
 <button
 id="translateButton"
@@ -362,12 +243,27 @@ onclick="translateVideo()"
 🌐 Translate Video
 </button>
 
+<div id="videoStatus" class="status"></div>
 
-<div id="videoStatus" class="status">
-</div>
+<div id="result" class="result" style="display:none;">
 
+<h3>🔎 Detected Language</h3>
 
-<div id="translationResults">
+<div id="detectedLanguage"></div>
+
+<h3>📝 Original Transcript</h3>
+
+<textarea
+id="transcript"
+readonly
+></textarea>
+
+<h3>🌐 Translation</h3>
+
+<textarea
+id="translation"
+readonly
+></textarea>
 
 </div>
 
@@ -377,85 +273,6 @@ onclick="translateVideo()"
 
 
 <script>
-
-/* =========================
-   AI CHAT
-========================= */
-
-async function askAI(){
-
-const question =
-document.getElementById("question").value.trim();
-
-const answer =
-document.getElementById("answer");
-
-const button =
-document.getElementById("sendButton");
-
-if(!question){
-
-answer.textContent =
-"Please type a question.";
-
-return;
-}
-
-answer.textContent =
-"Thinking... 🤖";
-
-button.disabled=true;
-
-try{
-
-const response =
-await fetch("/api/chat",{
-
-method:"POST",
-
-headers:{
-"Content-Type":"application/json"
-},
-
-body:JSON.stringify({
-question:question
-})
-
-});
-
-const data =
-await response.json();
-
-if(!response.ok){
-
-throw new Error(
-data.error || "Something went wrong."
-);
-
-}
-
-answer.textContent =
-"B1S2W AI:\n\n"+
-data.answer;
-
-}catch(error){
-
-answer.textContent =
-"B1S2W AI:\n\nError: "+
-error.message;
-
-}finally{
-
-button.disabled=false;
-
-}
-
-}
-
-
-/* =========================
-   VIDEO PREVIEW
-========================= */
 
 function previewVideo(){
 
@@ -468,7 +285,6 @@ document.getElementById("videoPreview");
 if(!file){
 
 video.style.display="none";
-
 return;
 
 }
@@ -482,40 +298,6 @@ video.style.display="block";
 
 }
 
-
-/* =========================
-   CONVERT FILE TO BASE64
-========================= */
-
-function fileToBase64(file){
-
-return new Promise((resolve,reject)=>{
-
-const reader=new FileReader();
-
-reader.onload=()=>{
-
-const result=reader.result;
-
-const base64=
-result.split(",")[1];
-
-resolve(base64);
-
-};
-
-reader.onerror=reject;
-
-reader.readAsDataURL(file);
-
-});
-
-}
-
-
-/* =========================
-   VIDEO TRANSLATOR
-========================= */
 
 async function translateVideo(){
 
@@ -534,13 +316,22 @@ document.getElementById("videoStatus");
 const button =
 document.getElementById("translateButton");
 
-const results =
-document.getElementById("translationResults");
+const result =
+document.getElementById("result");
+
+const detected =
+document.getElementById("detectedLanguage");
+
+const transcript =
+document.getElementById("transcript");
+
+const translation =
+document.getElementById("translation");
 
 
 if(!file){
 
-status.textContent=
+status.textContent =
 "❌ আগে একটি ভিডিও Upload করো।";
 
 return;
@@ -548,9 +339,9 @@ return;
 }
 
 
-if(original===target){
+if(original === target){
 
-status.textContent=
+status.textContent =
 "❌ Original Language এবং Translate To একই হতে পারবে না।";
 
 return;
@@ -560,23 +351,50 @@ return;
 
 button.disabled=true;
 
-results.innerHTML="";
+result.style.display="none";
 
-status.textContent=
-"⏳ Video প্রস্তুত করা হচ্ছে...\n\nএতে কিছু সময় লাগতে পারে।";
+status.textContent =
+"⏳ Video AI-তে পাঠানো হচ্ছে...\n\nএতে কিছু সময় লাগতে পারে।";
 
 
 try{
 
-const base64=
-await fileToBase64(file);
+const arrayBuffer =
+await file.arrayBuffer();
+
+const bytes =
+new Uint8Array(arrayBuffer);
+
+let binary="";
+
+const chunkSize=0x8000;
+
+for(
+let i=0;
+i<bytes.length;
+i+=chunkSize
+){
+
+binary += String.fromCharCode(
+...bytes.subarray(
+i,
+Math.min(i+chunkSize,bytes.length)
+)
+);
+
+}
+
+const videoBase64 =
+btoa(binary);
 
 
-status.textContent=
-"⏳ Video AI-তে পাঠানো হচ্ছে...\n\nদয়া করে অপেক্ষা করো।";
+status.textContent =
+"🤖 AI ভিডিও বিশ্লেষণ করছে...\n\n" +
+"🎧 Speech শনাক্ত করা হচ্ছে...\n" +
+"🌐 Translation তৈরি হচ্ছে...";
 
 
-const response=
+const response =
 await fetch("/api/translate-video",{
 
 method:"POST",
@@ -587,7 +405,7 @@ headers:{
 
 body:JSON.stringify({
 
-videoBase64:base64,
+videoBase64:videoBase64,
 
 mimeType:file.type,
 
@@ -600,14 +418,14 @@ targetLanguage:target
 });
 
 
-const data=
+const data =
 await response.json();
 
 
 if(!response.ok){
 
 throw new Error(
-typeof data.error==="string"
+typeof data.error === "string"
 ? data.error
 : JSON.stringify(data.error)
 );
@@ -615,58 +433,29 @@ typeof data.error==="string"
 }
 
 
-results.innerHTML=`
-
-<div class="result-box">
-
-<div class="detected">
-✅ Video translation complete!
-</div>
-
-<p>
-<b>Detected Language:</b>
-${escapeHTML(data.detectedLanguage || "Unknown")}
-</p>
-
-</div>
+detected.textContent =
+data.detectedLanguage || "Unknown";
 
 
-<div class="result-box">
-
-<div class="result-title">
-📝 Original Transcript
-</div>
-
-<textarea readonly>${escapeHTML(
-data.transcript || ""
-)}</textarea>
-
-</div>
+transcript.value =
+data.transcript || "";
 
 
-<div class="result-box">
-
-<div class="result-title">
-🌐 Translation
-</div>
-
-<textarea readonly>${escapeHTML(
-data.translation || ""
-)}</textarea>
-
-</div>
-
-`;
+translation.value =
+data.translation || "";
 
 
-status.textContent=
-"✅ Translation সফলভাবে সম্পন্ন হয়েছে।";
+result.style.display="block";
+
+
+status.textContent =
+"✅ Video translation complete!";
 
 
 }catch(error){
 
-status.textContent=
-"❌ Error:\n"+
+status.textContent =
+"❌ Error:\n" +
 error.message;
 
 }finally{
@@ -674,27 +463,6 @@ error.message;
 button.disabled=false;
 
 }
-
-}
-
-
-/* =========================
-   HTML SAFETY
-========================= */
-
-function escapeHTML(text){
-
-return String(text)
-
-.replace(/&/g,"&amp;")
-
-.replace(/</g,"&lt;")
-
-.replace(/>/g,"&gt;")
-
-.replace(/"/g,"&quot;")
-
-.replace(/'/g,"&#039;");
 
 }
 
