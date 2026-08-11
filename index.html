@@ -85,28 +85,18 @@ button{
   cursor:pointer;
 }
 
-button:hover{
-  background:#00b359;
-}
-
 button:disabled{
   opacity:.6;
   cursor:not-allowed;
 }
 
 .answer,
-.result-box{
+.status{
   margin-top:18px;
   background:#111827;
   padding:15px;
   border-radius:10px;
-  min-height:70px;
-  white-space:pre-wrap;
-}
-
-.status{
-  margin-top:15px;
-  color:#9ca3af;
+  min-height:60px;
   white-space:pre-wrap;
 }
 
@@ -115,8 +105,6 @@ button:disabled{
   margin-top:15px;
   border-radius:12px;
   display:none;
-  max-height:450px;
-  background:#000;
 }
 
 .language-grid{
@@ -126,24 +114,23 @@ button:disabled{
   margin-top:15px;
 }
 
-.result-title{
-  color:#00ff99;
-  margin-bottom:8px;
-}
-
 .small{
   color:#9ca3af;
-  font-size:13px;
-  margin-top:8px;
+  font-size:14px;
+  margin-top:10px;
+}
+
+.success{
+  color:#00ff99;
+}
+
+.error{
+  color:#ff6b6b;
 }
 
 @media(max-width:600px){
   .language-grid{
     grid-template-columns:1fr;
-  }
-
-  .header h1{
-    font-size:27px;
   }
 }
 </style>
@@ -152,8 +139,6 @@ button:disabled{
 <body>
 
 <div class="container">
-
-  <!-- HEADER -->
 
   <div class="header">
     <h1>🤖 B1S2W AI</h1>
@@ -195,7 +180,7 @@ button:disabled{
 
     <h2>🎬 Video Language Converter</h2>
 
-    <p style="color:#9ca3af;">
+    <p class="small">
       Upload a video and translate the spoken dialogue.
     </p>
 
@@ -206,9 +191,9 @@ button:disabled{
       onchange="previewVideo()"
     >
 
-    <div class="small">
-      ছোট ভিডিও দিয়ে প্রথমে পরীক্ষা করো।
-    </div>
+    <p class="small">
+      ছোট ভিডিও দিয়ে প্রথমে পরীক্ষা করো।
+    </p>
 
     <video
       id="videoPreview"
@@ -216,8 +201,6 @@ button:disabled{
       controls
     ></video>
 
-
-    <!-- LANGUAGES -->
 
     <div class="language-grid">
 
@@ -231,15 +214,15 @@ button:disabled{
             Auto Detect
           </option>
 
-          <option value="Bengali">
+          <option value="bengali">
             বাংলা
           </option>
 
-          <option value="Hindi">
+          <option value="hindi">
             हिन्दी
           </option>
 
-          <option value="English">
+          <option value="english">
             English
           </option>
 
@@ -254,15 +237,15 @@ button:disabled{
 
         <select id="targetLanguage">
 
-          <option value="Bengali">
+          <option value="bengali">
             বাংলা
           </option>
 
-          <option value="Hindi">
+          <option value="hindi">
             हिन्दी
           </option>
 
-          <option value="English">
+          <option value="english">
             English
           </option>
 
@@ -287,53 +270,26 @@ button:disabled{
     ></div>
 
 
-    <!-- DETECTED LANGUAGE -->
+    <h3 style="margin-top:25px;">
+      📝 Original Transcript
+    </h3>
 
-    <div
-      id="detectedBox"
-      class="result-box"
-      style="display:none;"
-    >
-      <div class="result-title">
-        🔎 Detected Language
-      </div>
-
-      <div id="detectedLanguage"></div>
-    </div>
+    <textarea
+      id="transcript"
+      readonly
+      placeholder="Original spoken dialogue will appear here..."
+    ></textarea>
 
 
-    <!-- TRANSCRIPT -->
+    <h3 style="margin-top:25px;">
+      🌐 Translation
+    </h3>
 
-    <div
-      id="transcriptBox"
-      class="result-box"
-      style="display:none;"
-    >
-
-      <div class="result-title">
-        📝 Original Transcript
-      </div>
-
-      <div id="transcript"></div>
-
-    </div>
-
-
-    <!-- TRANSLATION -->
-
-    <div
-      id="translationBox"
-      class="result-box"
-      style="display:none;"
-    >
-
-      <div class="result-title">
-        🌐 Translation
-      </div>
-
-      <div id="translation"></div>
-
-    </div>
+    <textarea
+      id="translation"
+      readonly
+      placeholder="Translated dialogue will appear here..."
+    ></textarea>
 
   </div>
 
@@ -342,10 +298,9 @@ button:disabled{
 
 <script>
 
-
-// =====================================
-// AI CHAT
-// =====================================
+/* ================================
+   AI CHAT
+================================ */
 
 async function askAI(){
 
@@ -383,8 +338,7 @@ async function askAI(){
         method:"POST",
 
         headers:{
-          "Content-Type":
-            "application/json"
+          "Content-Type":"application/json"
         },
 
         body:JSON.stringify({
@@ -400,23 +354,27 @@ async function askAI(){
 
     if(!response.ok){
 
+      const message =
+        typeof data.error === "string"
+          ? data.error
+          : JSON.stringify(data.error,null,2);
+
       throw new Error(
-        data.error ||
+        message ||
         "Something went wrong."
       );
-
     }
 
 
     answer.textContent =
       "B1S2W AI:\n\n" +
-      data.answer;
+      (data.answer || "No answer returned.");
 
 
   }catch(error){
 
     answer.textContent =
-      "B1S2W AI:\n\nError: " +
+      "B1S2W AI:\n\n❌ Error:\n" +
       error.message;
 
   }finally{
@@ -428,233 +386,141 @@ async function askAI(){
 }
 
 
-
-// =====================================
-// VIDEO PREVIEW
-// =====================================
+/* ================================
+   VIDEO PREVIEW
+================================ */
 
 function previewVideo(){
 
   const file =
-    document.getElementById(
-      "videoFile"
-    ).files[0];
+    document.getElementById("videoFile")
+    .files[0];
 
   const video =
-    document.getElementById(
-      "videoPreview"
-    );
+    document.getElementById("videoPreview");
 
 
   if(!file){
 
-    video.style.display =
-      "none";
+    video.style.display = "none";
 
     return;
+  }
+
+
+  const oldUrl =
+    video.dataset.url;
+
+  if(oldUrl){
+    URL.revokeObjectURL(oldUrl);
   }
 
 
   const url =
     URL.createObjectURL(file);
 
+  video.dataset.url = url;
 
   video.src = url;
 
-  video.style.display =
-    "block";
+  video.style.display = "block";
 
 }
 
 
-
-// =====================================
-// VIDEO TO BASE64
-// =====================================
-
-function fileToBase64(file){
-
-  return new Promise(
-    (resolve,reject)=>{
-
-      const reader =
-        new FileReader();
-
-      reader.onload = () => {
-
-        const result =
-          reader.result;
-
-        const base64 =
-          result.split(",")[1];
-
-        resolve(base64);
-
-      };
-
-      reader.onerror =
-        reject;
-
-      reader.readAsDataURL(file);
-
-    }
-  );
-
-}
-
-
-
-// =====================================
-// VIDEO TRANSLATOR
-// =====================================
+/* ================================
+   VIDEO TRANSLATOR
+================================ */
 
 async function translateVideo(){
 
   const file =
-    document.getElementById(
-      "videoFile"
-    ).files[0];
+    document.getElementById("videoFile")
+    .files[0];
 
   const original =
-    document.getElementById(
-      "originalLanguage"
-    ).value;
+    document.getElementById("originalLanguage")
+    .value;
 
   const target =
-    document.getElementById(
-      "targetLanguage"
-    ).value;
+    document.getElementById("targetLanguage")
+    .value;
 
   const status =
-    document.getElementById(
-      "videoStatus"
-    );
+    document.getElementById("videoStatus");
+
+  const transcript =
+    document.getElementById("transcript");
+
+  const translation =
+    document.getElementById("translation");
 
   const button =
-    document.getElementById(
-      "translateButton"
-    );
+    document.getElementById("translateButton");
 
-  const detectedBox =
-    document.getElementById(
-      "detectedBox"
-    );
-
-  const transcriptBox =
-    document.getElementById(
-      "transcriptBox"
-    );
-
-  const translationBox =
-    document.getElementById(
-      "translationBox"
-    );
-
-
-  // Hide old results
-
-  detectedBox.style.display =
-    "none";
-
-  transcriptBox.style.display =
-    "none";
-
-  translationBox.style.display =
-    "none";
-
-
-  // Check video
 
   if(!file){
 
-    status.textContent =
-      "❌ আগে একটি ভিডিও Upload করো।";
+    status.innerHTML =
+      '<span class="error">❌ আগে একটি ভিডিও Upload করো।</span>';
 
     return;
   }
 
 
-  // Prevent same language
+  if(original === target){
 
-  if(
-    original !== "auto" &&
-    original === target
-  ){
-
-    status.textContent =
-      "❌ Original language এবং Target language একই।";
+    status.innerHTML =
+      '<span class="error">❌ Original language এবং Target language একই হতে পারবে না।</span>';
 
     return;
   }
 
 
-  // Small-video test limit
-
-  const maxSize =
-    10 * 1024 * 1024;
-
-  if(file.size > maxSize){
-
-    status.textContent =
-      "❌ ভিডিওটি অনেক বড়। প্রথমে 10 MB-এর কম একটি ভিডিও দিয়ে test করো।";
-
-    return;
-  }
-
+  /*
+    Browser থেকে সরাসরি পুরো ভিডিও
+    Base64 হিসেবে backend-এ পাঠানো হবে।
+  */
 
   button.disabled = true;
 
+  transcript.value = "";
+  translation.value = "";
+
 
   status.textContent =
-    "⏳ Video reading হচ্ছে...\n\n" +
-    "তারপর AI ভিডিওর spoken dialogue বিশ্লেষণ করবে।";
+    "⏳ Video AI-কে পাঠানো হচ্ছে...\n\n" +
+    "এতে কিছু সময় লাগতে পারে।";
 
 
   try{
-
-    // Convert video to Base64
 
     const videoBase64 =
       await fileToBase64(file);
 
 
-    status.textContent =
-      "⏳ Video AI-তে পাঠানো হচ্ছে...\n\n" +
-      "এতে কিছু সময় লাগতে পারে।";
-
-
-    // Send to backend
-
     const response =
-      await fetch(
-        "/api/translate-video",
-        {
+      await fetch("/api/translate-video",{
 
-          method:"POST",
+        method:"POST",
 
-          headers:{
-            "Content-Type":
-              "application/json"
-          },
+        headers:{
+          "Content-Type":"application/json"
+        },
 
-          body:JSON.stringify({
+        body:JSON.stringify({
 
-            videoBase64:
-              videoBase64,
+          videoBase64:videoBase64,
 
-            mimeType:
-              file.type,
+          mimeType:file.type,
 
-            originalLanguage:
-              original,
+          originalLanguage:original,
 
-            targetLanguage:
-              target
+          targetLanguage:target
 
-          })
+        })
 
-        }
-      );
+      });
 
 
     const data =
@@ -663,61 +529,41 @@ async function translateVideo(){
 
     if(!response.ok){
 
+      const errorMessage =
+        typeof data.error === "string"
+          ? data.error
+          : JSON.stringify(data.error,null,2);
+
       throw new Error(
-        data.error ||
+        errorMessage ||
         "Video translation failed."
       );
-
     }
 
 
-    // Detected language
+    /*
+      Backend থেকে আসা result
+    */
 
-    document.getElementById(
-      "detectedLanguage"
-    ).textContent =
-      data.detectedLanguage ||
-      "Unknown";
-
-
-    detectedBox.style.display =
-      "block";
+    transcript.value =
+      data.transcript || "";
 
 
-    // Original transcript
-
-    document.getElementById(
-      "transcript"
-    ).textContent =
-      data.transcript ||
-      "No speech detected.";
+    translation.value =
+      data.translation || "";
 
 
-    transcriptBox.style.display =
-      "block";
+    status.innerHTML =
+      '<span class="success">✅ Video translation complete!</span>\n\n' +
 
-
-    // Translation
-
-    document.getElementById(
-      "translation"
-    ).textContent =
-      data.translation ||
-      "No translation returned.";
-
-
-    translationBox.style.display =
-      "block";
-
-
-    status.textContent =
-      "✅ Video translation complete!";
+      "Detected Language: " +
+      (data.detectedLanguage || "Unknown");
 
 
   }catch(error){
 
-    status.textContent =
-      "❌ Error:\n" +
+    status.innerHTML =
+      '<span class="error">❌ Error:</span>\n\n' +
       error.message;
 
   }finally{
@@ -725,6 +571,56 @@ async function translateVideo(){
     button.disabled = false;
 
   }
+
+}
+
+
+/* ================================
+   FILE → BASE64
+================================ */
+
+function fileToBase64(file){
+
+  return new Promise((resolve,reject)=>{
+
+    const reader =
+      new FileReader();
+
+
+    reader.onload = () => {
+
+      const result =
+        reader.result;
+
+
+      /*
+        data:video/mp4;base64,...
+        থেকে শুধু Base64 অংশ নেওয়া হচ্ছে।
+      */
+
+      const base64 =
+        result.split(",")[1];
+
+
+      resolve(base64);
+
+    };
+
+
+    reader.onerror = () => {
+
+      reject(
+        new Error(
+          "ভিডিও পড়তে সমস্যা হয়েছে।"
+        )
+      );
+
+    };
+
+
+    reader.readAsDataURL(file);
+
+  });
 
 }
 
