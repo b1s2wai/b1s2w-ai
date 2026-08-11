@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -32,6 +32,7 @@ body{
 .header h1{
   margin:0;
   color:#00ff99;
+  font-size:32px;
 }
 
 .header p{
@@ -93,7 +94,8 @@ button:disabled{
   cursor:not-allowed;
 }
 
-.answer{
+.answer,
+.result-box{
   margin-top:18px;
   background:#111827;
   padding:15px;
@@ -113,17 +115,35 @@ button:disabled{
   margin-top:15px;
   border-radius:12px;
   display:none;
+  max-height:450px;
+  background:#000;
 }
 
 .language-grid{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:15px;
+  margin-top:15px;
+}
+
+.result-title{
+  color:#00ff99;
+  margin-bottom:8px;
+}
+
+.small{
+  color:#9ca3af;
+  font-size:13px;
+  margin-top:8px;
 }
 
 @media(max-width:600px){
   .language-grid{
     grid-template-columns:1fr;
+  }
+
+  .header h1{
+    font-size:27px;
   }
 }
 </style>
@@ -132,6 +152,8 @@ button:disabled{
 <body>
 
 <div class="container">
+
+  <!-- HEADER -->
 
   <div class="header">
     <h1>🤖 B1S2W AI</h1>
@@ -152,23 +174,29 @@ button:disabled{
       autocomplete="off"
     >
 
-    <button id="sendButton" onclick="askAI()">
+    <button
+      id="sendButton"
+      onclick="askAI()"
+    >
       Send
     </button>
 
-    <div id="answer" class="answer"></div>
+    <div
+      id="answer"
+      class="answer"
+    ></div>
 
   </div>
 
 
-  <!-- VIDEO LANGUAGE CONVERTER -->
+  <!-- VIDEO TRANSLATOR -->
 
   <div class="card">
 
     <h2>🎬 Video Language Converter</h2>
 
     <p style="color:#9ca3af;">
-      Upload a video and choose the language you want.
+      Upload a video and translate the spoken dialogue.
     </p>
 
     <input
@@ -178,12 +206,18 @@ button:disabled{
       onchange="previewVideo()"
     >
 
+    <div class="small">
+      ছোট ভিডিও দিয়ে প্রথমে পরীক্ষা করো।
+    </div>
+
     <video
       id="videoPreview"
       class="video-preview"
       controls
     ></video>
 
+
+    <!-- LANGUAGES -->
 
     <div class="language-grid">
 
@@ -197,15 +231,15 @@ button:disabled{
             Auto Detect
           </option>
 
-          <option value="bengali">
+          <option value="Bengali">
             বাংলা
           </option>
 
-          <option value="hindi">
+          <option value="Hindi">
             हिन्दी
           </option>
 
-          <option value="english">
+          <option value="English">
             English
           </option>
 
@@ -220,15 +254,15 @@ button:disabled{
 
         <select id="targetLanguage">
 
-          <option value="bengali">
+          <option value="Bengali">
             বাংলা
           </option>
 
-          <option value="hindi">
+          <option value="Hindi">
             हिन्दी
           </option>
 
-          <option value="english">
+          <option value="English">
             English
           </option>
 
@@ -253,14 +287,53 @@ button:disabled{
     ></div>
 
 
-    <h3 style="margin-top:25px;">
-      📝 Translation
-    </h3>
+    <!-- DETECTED LANGUAGE -->
 
-    <textarea
-      id="translation"
-      placeholder="Translated text will appear here..."
-    ></textarea>
+    <div
+      id="detectedBox"
+      class="result-box"
+      style="display:none;"
+    >
+      <div class="result-title">
+        🔎 Detected Language
+      </div>
+
+      <div id="detectedLanguage"></div>
+    </div>
+
+
+    <!-- TRANSCRIPT -->
+
+    <div
+      id="transcriptBox"
+      class="result-box"
+      style="display:none;"
+    >
+
+      <div class="result-title">
+        📝 Original Transcript
+      </div>
+
+      <div id="transcript"></div>
+
+    </div>
+
+
+    <!-- TRANSLATION -->
+
+    <div
+      id="translationBox"
+      class="result-box"
+      style="display:none;"
+    >
+
+      <div class="result-title">
+        🌐 Translation
+      </div>
+
+      <div id="translation"></div>
+
+    </div>
 
   </div>
 
@@ -270,9 +343,9 @@ button:disabled{
 <script>
 
 
-// ===============================
+// =====================================
 // AI CHAT
-// ===============================
+// =====================================
 
 async function askAI(){
 
@@ -356,9 +429,9 @@ async function askAI(){
 
 
 
-// ===============================
+// =====================================
 // VIDEO PREVIEW
-// ===============================
+// =====================================
 
 function previewVideo(){
 
@@ -395,9 +468,45 @@ function previewVideo(){
 
 
 
-// ===============================
+// =====================================
+// VIDEO TO BASE64
+// =====================================
+
+function fileToBase64(file){
+
+  return new Promise(
+    (resolve,reject)=>{
+
+      const reader =
+        new FileReader();
+
+      reader.onload = () => {
+
+        const result =
+          reader.result;
+
+        const base64 =
+          result.split(",")[1];
+
+        resolve(base64);
+
+      };
+
+      reader.onerror =
+        reject;
+
+      reader.readAsDataURL(file);
+
+    }
+  );
+
+}
+
+
+
+// =====================================
 // VIDEO TRANSLATOR
-// ===============================
+// =====================================
 
 async function translateVideo(){
 
@@ -421,16 +530,40 @@ async function translateVideo(){
       "videoStatus"
     );
 
-  const translation =
-    document.getElementById(
-      "translation"
-    );
-
   const button =
     document.getElementById(
       "translateButton"
     );
 
+  const detectedBox =
+    document.getElementById(
+      "detectedBox"
+    );
+
+  const transcriptBox =
+    document.getElementById(
+      "transcriptBox"
+    );
+
+  const translationBox =
+    document.getElementById(
+      "translationBox"
+    );
+
+
+  // Hide old results
+
+  detectedBox.style.display =
+    "none";
+
+  transcriptBox.style.display =
+    "none";
+
+  translationBox.style.display =
+    "none";
+
+
+  // Check video
 
   if(!file){
 
@@ -441,7 +574,12 @@ async function translateVideo(){
   }
 
 
-  if(original === target){
+  // Prevent same language
+
+  if(
+    original !== "auto" &&
+    original === target
+  ){
 
     status.textContent =
       "❌ Original language এবং Target language একই।";
@@ -450,57 +588,73 @@ async function translateVideo(){
   }
 
 
+  // Small-video test limit
+
+  const maxSize =
+    10 * 1024 * 1024;
+
+  if(file.size > maxSize){
+
+    status.textContent =
+      "❌ ভিডিওটি অনেক বড়। প্রথমে 10 MB-এর কম একটি ভিডিও দিয়ে test করো।";
+
+    return;
+  }
+
+
   button.disabled = true;
 
-  translation.value = "";
 
   status.textContent =
-    "⏳ Video selected.\n\n" +
-    "Next step: extracting the speech from the video...";
+    "⏳ Video reading হচ্ছে...\n\n" +
+    "তারপর AI ভিডিওর spoken dialogue বিশ্লেষণ করবে।";
 
 
   try{
 
-    /*
-      IMPORTANT:
+    // Convert video to Base64
 
-      এই জায়গায় পরের ধাপে
-      Video → Audio → Speech-to-Text
-      API যুক্ত করা হবে।
-
-      এখন আমরা test করার জন্য
-      একটি sample request পাঠাচ্ছি।
-    */
+    const videoBase64 =
+      await fileToBase64(file);
 
 
-    const question =
-      `I want to translate a video.
-
-Original language:
-${original}
-
-Target language:
-${target}
-
-Please explain the translation workflow and prepare the translated text format.`;
+    status.textContent =
+      "⏳ Video AI-তে পাঠানো হচ্ছে...\n\n" +
+      "এতে কিছু সময় লাগতে পারে।";
 
 
+    // Send to backend
 
     const response =
-      await fetch("/api/chat",{
+      await fetch(
+        "/api/translate-video",
+        {
 
-        method:"POST",
+          method:"POST",
 
-        headers:{
-          "Content-Type":
-            "application/json"
-        },
+          headers:{
+            "Content-Type":
+              "application/json"
+          },
 
-        body:JSON.stringify({
-          question:question
-        })
+          body:JSON.stringify({
 
-      });
+            videoBase64:
+              videoBase64,
+
+            mimeType:
+              file.type,
+
+            originalLanguage:
+              original,
+
+            targetLanguage:
+              target
+
+          })
+
+        }
+      );
 
 
     const data =
@@ -511,25 +665,59 @@ Please explain the translation workflow and prepare the translated text format.`
 
       throw new Error(
         data.error ||
-        "Translation request failed."
+        "Video translation failed."
       );
 
     }
 
 
-    translation.value =
-      data.answer;
+    // Detected language
+
+    document.getElementById(
+      "detectedLanguage"
+    ).textContent =
+      data.detectedLanguage ||
+      "Unknown";
+
+
+    detectedBox.style.display =
+      "block";
+
+
+    // Original transcript
+
+    document.getElementById(
+      "transcript"
+    ).textContent =
+      data.transcript ||
+      "No speech detected.";
+
+
+    transcriptBox.style.display =
+      "block";
+
+
+    // Translation
+
+    document.getElementById(
+      "translation"
+    ).textContent =
+      data.translation ||
+      "No translation returned.";
+
+
+    translationBox.style.display =
+      "block";
 
 
     status.textContent =
-      "✅ Translation system connected.\n\n" +
-      "⚠️ Actual video speech extraction এখনো connect করা হয়নি।";
+      "✅ Video translation complete!";
 
 
   }catch(error){
 
     status.textContent =
-      "❌ Error: " +
+      "❌ Error:\n" +
       error.message;
 
   }finally{
@@ -543,4 +731,4 @@ Please explain the translation workflow and prepare the translated text format.`
 </script>
 
 </body>
-</html>
+      </html>
