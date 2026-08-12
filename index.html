@@ -7,7 +7,9 @@
 <title>B1S2W AI</title>
 
 <style>
-*{box-sizing:border-box}
+*{
+  box-sizing:border-box;
+}
 
 body{
   margin:0;
@@ -41,13 +43,16 @@ body{
   padding:20px;
   border-radius:16px;
   margin-top:20px;
+  box-shadow:0 0 20px rgba(0,0,0,.25);
 }
 
-input,textarea,select{
+input,
+textarea,
+select{
   width:100%;
   padding:13px;
   margin-top:10px;
-  border:0;
+  border:none;
   border-radius:10px;
   font-size:16px;
   background:#111827;
@@ -63,7 +68,7 @@ button{
   width:100%;
   margin-top:15px;
   padding:13px;
-  border:0;
+  border:none;
   border-radius:10px;
   background:#00cc66;
   color:white;
@@ -95,6 +100,10 @@ button:disabled{
   white-space:pre-wrap;
 }
 
+.timeline{
+  margin-top:20px;
+}
+
 .dialogue-card{
   background:#0f172a;
   border:1px solid #374151;
@@ -106,6 +115,7 @@ button:disabled{
 .dialogue-header{
   display:flex;
   justify-content:space-between;
+  align-items:center;
   gap:10px;
 }
 
@@ -117,37 +127,24 @@ button:disabled{
 
 .time{
   color:#fbbf24;
-}
-
-.field{
-  margin-top:12px;
-}
-
-.field label{
-  display:block;
-  margin-top:5px;
-  color:#9ca3af;
-  font-size:13px;
+  font-size:14px;
 }
 
 .small-grid{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:12px;
+  margin-top:10px;
 }
 
-.voice-box{
-  margin-top:15px;
-  padding:12px;
-  border:1px solid #374151;
-  border-radius:12px;
-  background:#111827;
+.small-grid label,
+.voice-row label{
+  color:#9ca3af;
+  font-size:13px;
 }
 
-.voice-box label{
-  display:block;
-  color:#00ff99;
-  font-weight:bold;
+.voice-row{
+  margin-top:12px;
 }
 
 .edit-button{
@@ -172,6 +169,7 @@ button:disabled{
 
   .dialogue-header{
     flex-direction:column;
+    align-items:flex-start;
   }
 }
 </style>
@@ -183,15 +181,15 @@ button:disabled{
 
 <div class="header">
 <h1>🤖 B1S2W AI</h1>
-<p>🎬 AI Video Language Converter & Multi-Character Dialogue</p>
+<p>🎬 AI Video Language Converter & Dialogue Timeline</p>
 </div>
 
 <div class="card">
 
 <h2>🎬 Video Language Converter</h2>
 
-<p style="color:#9ca3af">
-ভিডিও Upload করো এবং সব Character-এর dialogue আলাদা করে translation তৈরি করো।
+<p style="color:#9ca3af;">
+ভিডিও Upload করো এবং dialogue আলাদা করে translation তৈরি করো।
 </p>
 
 <input
@@ -214,6 +212,7 @@ controls
 <label>Original Language</label>
 
 <select id="originalLanguage">
+
 <option value="auto">🌐 Auto Detect</option>
 <option value="bengali">🇧🇩 বাংলা</option>
 <option value="hindi">🇮🇳 हिन्दी</option>
@@ -221,25 +220,7 @@ controls
 <option value="japanese">🇯🇵 日本語</option>
 <option value="korean">🇰🇷 한국어</option>
 <option value="chinese">🇨🇳 中文</option>
-<option value="spanish">🇪🇸 Español</option>
-<option value="french">🇫🇷 Français</option>
-<option value="german">🇩🇪 Deutsch</option>
-<option value="arabic">🇸🇦 العربية</option>
-<option value="portuguese">🇵🇹 Português</option>
-<option value="russian">🇷🇺 Русский</option>
-<option value="italian">🇮🇹 Italiano</option>
-<option value="turkish">🇹🇷 Türkçe</option>
-<option value="vietnamese">🇻🇳 Tiếng Việt</option>
-<option value="thai">🇹🇭 ไทย</option>
-<option value="indonesian">🇮🇩 Bahasa Indonesia</option>
-<option value="urdu">🇵🇰 اردو</option>
-<option value="tamil">🇮🇳 தமிழ்</option>
-<option value="telugu">🇮🇳 తెలుగు</option>
-<option value="marathi">🇮🇳 मराठी</option>
-<option value="gujarati">🇮🇳 ગુજરાતી</option>
-<option value="punjabi">🇮🇳 ਪੰਜਾਬী</option>
-<option value="malayalam">🇮🇳 മലയാളം</option>
-<option value="nepali">🇳🇵 नेपाली</option>
+
 </select>
 
 </div>
@@ -249,31 +230,14 @@ controls
 <label>Translate To</label>
 
 <select id="targetLanguage">
+
 <option value="bengali">🇧🇩 বাংলা</option>
 <option value="hindi">🇮🇳 हिन्दी</option>
 <option value="english">🇺🇸 English</option>
 <option value="japanese">🇯🇵 日本語</option>
 <option value="korean">🇰🇷 한국어</option>
 <option value="chinese">🇨🇳 中文</option>
-<option value="spanish">🇪🇸 Español</option>
-<option value="french">🇫🇷 Français</option>
-<option value="german">🇩🇪 Deutsch</option>
-<option value="arabic">🇸🇦 العربية</option>
-<option value="portuguese">🇵🇹 Português</option>
-<option value="russian">🇷🇺 Русский</option>
-<option value="italian">🇮🇹 Italiano</option>
-<option value="turkish">🇹🇷 Türkçe</option>
-<option value="vietnamese">🇻🇳 Tiếng Việt</option>
-<option value="thai">🇹🇭 ไทย</option>
-<option value="indonesian">🇮🇩 Bahasa Indonesia</option>
-<option value="urdu">🇵🇰 اردو</option>
-<option value="tamil">🇮🇳 தமிழ்</option>
-<option value="telugu">🇮🇳 తెలుగు</option>
-<option value="marathi">🇮🇳 मराठी</option>
-<option value="gujarati">🇮🇳 ગુજરાતી</option>
-<option value="punjabi">🇮🇳 ਪੰਜਾਬী</option>
-<option value="malayalam">🇮🇳 മലയാളം</option>
-<option value="nepali">🇳🇵 नेपाली</option>
+
 </select>
 
 </div>
@@ -291,102 +255,121 @@ onclick="translateVideo()"
 
 </div>
 
-
 <div
 id="timelineCard"
 class="card"
-style="display:none"
+style="display:none;"
 >
 
 <h2>🎬 Dialogue Timeline</h2>
 
+<p style="color:#9ca3af;">
+প্রতিটি Character-এর dialogue, timing এবং voice আলাদাভাবে edit করতে পারবে।
+</p>
+
 <div id="detectedLanguage"></div>
 
-<div id="dialogueTimeline"></div>
+<div
+id="dialogueTimeline"
+class="timeline"
+></div>
 
 </div>
 
 </div>
-
 
 <script>
 
-let dialogueData=[];
+let dialogueData = [];
 
 
-/* VIDEO PREVIEW */
+/* =========================
+   VIDEO PREVIEW
+========================= */
 
 function previewVideo(){
 
-const file=
+const file =
 document.getElementById("videoFile").files[0];
 
-const video=
+const video =
 document.getElementById("videoPreview");
 
 if(!file){
+
 video.style.display="none";
 return;
+
 }
 
-video.src=URL.createObjectURL(file);
+video.src =
+URL.createObjectURL(file);
+
 video.style.display="block";
 
 }
 
 
-/* TRANSLATE */
+/* =========================
+   TRANSLATE VIDEO
+========================= */
 
 async function translateVideo(){
 
-const file=
+const file =
 document.getElementById("videoFile").files[0];
 
-const original=
+const original =
 document.getElementById("originalLanguage").value;
 
-const target=
+const target =
 document.getElementById("targetLanguage").value;
 
-const status=
+const status =
 document.getElementById("videoStatus");
 
-const button=
+const button =
 document.getElementById("translateButton");
+
+const timelineCard =
+document.getElementById("timelineCard");
+
 
 if(!file){
 
-status.textContent=
+status.textContent =
 "❌ আগে একটি ভিডিও Upload করো।";
 
 return;
 
 }
 
-if(original===target){
 
-status.textContent=
+if(original === target){
+
+status.textContent =
 "❌ Original Language এবং Translate To একই হতে পারবে না।";
 
 return;
 
 }
 
+
 button.disabled=true;
 
-status.textContent=
-"🤖 AI ভিডিও বিশ্লেষণ করছে...\n\n"+
-"👥 Speakers শনাক্ত হচ্ছে...\n"+
-"⏱ Dialogue timing বের হচ্ছে...\n"+
-"🌐 Translation তৈরি হচ্ছে...";
+timelineCard.style.display="none";
+
+status.textContent =
+"⏳ Video AI-তে পাঠানো হচ্ছে...";
+
 
 try{
 
-const buffer=
+const arrayBuffer =
 await file.arrayBuffer();
 
-const bytes=
-new Uint8Array(buffer);
+const bytes =
+new Uint8Array(arrayBuffer);
 
 let binary="";
 
@@ -398,19 +381,33 @@ i<bytes.length;
 i+=chunkSize
 ){
 
-binary+=String.fromCharCode(
+binary += String.fromCharCode(
 ...bytes.subarray(
 i,
-Math.min(i+chunkSize,bytes.length)
+Math.min(
+i+chunkSize,
+bytes.length
+)
 )
 );
 
 }
 
-const videoBase64=btoa(binary);
+const videoBase64 =
+btoa(binary);
 
-const response=
-await fetch("/api/translate-video",{
+
+status.textContent =
+"🤖 AI ভিডিও বিশ্লেষণ করছে...\n\n"+
+"👥 Speakers শনাক্ত করা হচ্ছে...\n"+
+"⏱ Dialogue timing বের করা হচ্ছে...\n"+
+"🌐 Translation তৈরি হচ্ছে...";
+
+
+const response =
+await fetch(
+"/api/translate-video",
+{
 
 method:"POST",
 
@@ -421,50 +418,61 @@ headers:{
 body:JSON.stringify({
 
 videoBase64,
+
 mimeType:file.type,
+
 originalLanguage:original,
+
 targetLanguage:target
 
 })
 
 });
 
-const data=
+
+const data =
 await response.json();
+
 
 if(!response.ok){
 
 throw new Error(
-data.error||"Translation failed."
+data.error ||
+"Translation failed."
 );
 
 }
 
-dialogueData=
+
+dialogueData =
 Array.isArray(data.dialogues)
-?data.dialogues
-:[];
+? data.dialogues
+: [];
+
 
 document.getElementById(
 "detectedLanguage"
-).innerHTML=
+).innerHTML =
 "<b>🔎 Detected Language:</b> "+
 escapeHtml(
-data.detectedLanguage||"Unknown"
+data.detectedLanguage ||
+"Unknown"
 );
+
 
 renderTimeline();
 
-document.getElementById(
-"timelineCard"
-).style.display="block";
 
-status.textContent=
+timelineCard.style.display="block";
+
+
+status.textContent =
 "✅ Dialogue analysis complete!";
+
 
 }catch(error){
 
-status.textContent=
+status.textContent =
 "❌ Error:\n"+
 error.message;
 
@@ -477,20 +485,95 @@ button.disabled=false;
 }
 
 
-/* TIMELINE */
+/* =========================
+   VOICE LIST
+========================= */
+
+function getVoiceOptions(selectedVoice){
+
+const voices = [
+
+{
+id:"voice1",
+name:"👨 Male 1 — Natural"
+},
+
+{
+id:"voice2",
+name:"👩 Female 1 — Natural"
+},
+
+{
+id:"voice3",
+name:"👨 Male 2 — Deep"
+},
+
+{
+id:"voice4",
+name:"👩 Female 2 — Soft"
+},
+
+{
+id:"voice5",
+name:"👨 Male 3 — Young"
+},
+
+{
+id:"voice6",
+name:"👩 Female 3 — Young"
+},
+
+{
+id:"voice7",
+name:"👨 Male 4 — Anime"
+},
+
+{
+id:"voice8",
+name:"👩 Female 4 — Anime"
+},
+
+{
+id:"voice9",
+name:"🎙️ Neutral"
+}
+
+];
+
+
+return voices.map(
+voice => `
+
+<option
+value="${voice.id}"
+${voice.id === selectedVoice ? "selected" : ""}
+>
+${voice.name}
+</option>
+
+`
+).join("");
+
+}
+
+
+/* =========================
+   RENDER TIMELINE
+========================= */
 
 function renderTimeline(){
 
-const container=
+const container =
 document.getElementById(
 "dialogueTimeline"
 );
 
 container.innerHTML="";
 
+
 if(!dialogueData.length){
 
-container.innerHTML=
+container.innerHTML =
 '<div class="empty">'+
 'কোনো dialogue পাওয়া যায়নি।'+
 '</div>';
@@ -500,85 +583,68 @@ return;
 }
 
 
-/*
-  প্রথমে speaker অনুযায়ী voice তৈরি করা হচ্ছে।
-  একই speakerId আবার এলে একই voice থাকবে।
-*/
-
-const speakerVoices={};
-
-let nextVoice=0;
-
-const voices=[
-"male1",
-"male2",
-"youngMale",
-"female1",
-"female2",
-"youngFemale",
-"neutral",
-"animeMale",
-"animeFemale"
-];
-
-
-dialogueData.forEach(item=>{
-
-const id=
-item.speakerId||
-item.speaker||
-"unknown";
-
-if(!speakerVoices[id]){
-
-speakerVoices[id]=
-item.voice||
-voices[
-nextVoice%voices.length
-];
-
-nextVoice++;
-
-}
-
-});
-
-
 dialogueData.forEach(
 (item,index)=>{
 
-const speakerId=
-item.speakerId||
-item.speaker||
-"unknown";
 
-const currentVoice=
-speakerVoices[speakerId];
+/*
+ * Character number বের করা
+ */
 
-const card=
+const characterNumber =
+getCharacterNumber(item,index);
+
+
+/*
+ * Backend voice না দিলে
+ * Character number অনুযায়ী voice।
+ */
+
+const defaultVoice =
+item.voice ||
+`voice${characterNumber}`;
+
+
+/*
+ * একই Character-এর voice
+ * সব dialogue-এ একই থাকবে।
+ */
+
+item.voice =
+defaultVoice;
+
+
+const card =
 document.createElement("div");
 
-card.className=
+card.className =
 "dialogue-card";
 
-card.innerHTML=`
+
+card.innerHTML = `
 
 <div class="dialogue-header">
 
 <div class="speaker">
-👤 ${escapeHtml(
-item.speaker||"Character"
-)}
+
+👤 Character ${characterNumber}
+
 </div>
 
 <div class="time">
+
 ⏱ ${escapeHtml(
-item.startTime||"00:00"
+item.startTime ||
+"00:00.00"
 )}
- →
- ${escapeHtml(
-item.endTime||"00:00"
+
+→
+
+${escapeHtml(
+item.endTime ||
+"00:00.00"
 )}
+
 </div>
 
 </div>
@@ -586,28 +652,30 @@ item.endTime||"00:00"
 
 <div class="small-grid">
 
-<div class="field">
+<div>
 
 <label>Start Time</label>
 
 <input
 id="start-${index}"
 value="${escapeAttr(
-item.startTime||"00:00"
+item.startTime ||
+"00:00.00"
 )}"
 >
 
 </div>
 
 
-<div class="field">
+<div>
 
 <label>End Time</label>
 
 <input
 id="end-${index}"
 value="${escapeAttr(
-item.endTime||"00:00"
+item.endTime ||
+"00:00.00"
 )}"
 >
 
@@ -616,85 +684,45 @@ item.endTime||"00:00"
 </div>
 
 
-<div class="field">
+<div>
 
 <label>📝 Original Dialogue</label>
 
 <textarea
 id="original-${index}"
 >${escapeHtml(
-item.transcript||""
+item.transcript ||
+""
 )}</textarea>
 
 </div>
 
 
-<div class="field">
+<div>
 
 <label>🌐 Translation</label>
 
 <textarea
 id="translation-${index}"
 >${escapeHtml(
-item.translation||""
+item.translation ||
+""
 )}</textarea>
 
 </div>
 
 
-<div class="voice-box">
+<div class="voice-row">
 
-<label>🎙️ Character Voice</label>
+<label>
+🎙️ Character Voice
+</label>
 
-<select
-id="voice-${index}"
-onchange="changeVoice(${index})"
->
+<select id="voice-${index}">
 
-<option value="male1"
-${currentVoice==="male1"?"selected":""}>
-👨 Male 1 — Natural
-</option>
-
-<option value="male2"
-${currentVoice==="male2"?"selected":""}>
-👨 Male 2 — Deep
-</option>
-
-<option value="youngMale"
-${currentVoice==="youngMale"?"selected":""}>
-👦 Young Male
-</option>
-
-<option value="female1"
-${currentVoice==="female1"?"selected":""}>
-👩 Female 1 — Natural
-</option>
-
-<option value="female2"
-${currentVoice==="female2"?"selected":""}>
-👩 Female 2 — Soft
-</option>
-
-<option value="youngFemale"
-${currentVoice==="youngFemale"?"selected":""}>
-👧 Young Female
-</option>
-
-<option value="neutral"
-${currentVoice==="neutral"?"selected":""}>
-🧑 Neutral
-</option>
-
-<option value="animeMale"
-${currentVoice==="animeMale"?"selected":""}>
-🎭 Anime Male
-</option>
-
-<option value="animeFemale"
-${currentVoice==="animeFemale"?"selected":""}>
-🎭 Anime Female
-</option>
+${getVoiceOptions(
+defaultVoice
+)}
 
 </select>
 
@@ -718,6 +746,7 @@ onclick="saveDialogue(${index})"
 
 `;
 
+
 container.appendChild(card);
 
 });
@@ -725,160 +754,284 @@ container.appendChild(card);
 }
 
 
-/* CHANGE VOICE */
+/* =========================
+   CHARACTER NUMBER
+========================= */
 
-function changeVoice(index){
+function getCharacterNumber(item,index){
 
-const item=
+const speakerId =
+String(
+item.speakerId ||
+""
+);
+
+
+const idMatch =
+speakerId.match(
+/(?:speaker[_ -]?)(\d+)/i
+);
+
+
+if(idMatch){
+
+const number =
+parseInt(
+idMatch[1],
+10
+);
+
+if(
+Number.isInteger(number) &&
+number>0
+){
+
+return number;
+
+}
+
+}
+
+
+const speaker =
+String(
+item.speaker ||
+""
+);
+
+
+const speakerMatch =
+speaker.match(
+/(?:character|speaker)[ _-]?(\d+)/i
+);
+
+
+if(speakerMatch){
+
+const number =
+parseInt(
+speakerMatch[1],
+10
+);
+
+if(
+Number.isInteger(number) &&
+number>0
+){
+
+return number;
+
+}
+
+}
+
+
+return index+1;
+
+}
+
+
+/* =========================
+   SAVE DIALOGUE
+========================= */
+
+function saveDialogue(index){
+
+const item =
 dialogueData[index];
 
-if(!item)return;
+if(!item){
+return;
+}
 
-const selected=
+
+item.startTime =
+document.getElementById(
+"start-"+index
+).value;
+
+
+item.endTime =
+document.getElementById(
+"end-"+index
+).value;
+
+
+item.transcript =
+document.getElementById(
+"original-"+index
+).value;
+
+
+item.translation =
+document.getElementById(
+"translation-"+index
+).value;
+
+
+item.voice =
 document.getElementById(
 "voice-"+index
 ).value;
 
-const speakerId=
-item.speakerId||
-item.speaker||
-"unknown";
-
 
 /*
-  একই Character-এর সব dialogue-এ
-  একই voice সেট করা হচ্ছে।
-*/
+ * Save করার পর
+ * একই Character-এর voice
+ * পরের dialogue-তেও থাকবে।
+ */
 
-dialogueData.forEach(other=>{
+const characterNumber =
+getCharacterNumber(
+item,
+index
+);
 
-const otherId=
-other.speakerId||
-other.speaker||
-"unknown";
 
-if(otherId===speakerId){
+dialogueData.forEach(
+(otherItem,otherIndex)=>{
 
-other.voice=selected;
+if(
+getCharacterNumber(
+otherItem,
+otherIndex
+) === characterNumber
+){
+
+otherItem.voice =
+item.voice;
 
 }
 
 });
 
+
 renderTimeline();
 
-}
-
-
-/* SAVE */
-
-function saveDialogue(index){
-
-const item=
-dialogueData[index];
-
-if(!item)return;
-
-item.startTime=
-document.getElementById(
-"start-"+index
-).value;
-
-item.endTime=
-document.getElementById(
-"end-"+index
-).value;
-
-item.transcript=
-document.getElementById(
-"original-"+index
-).value;
-
-item.translation=
-document.getElementById(
-"translation-"+index
-).value;
-
-item.voice=
-document.getElementById(
-"voice-"+index
-).value;
 
 alert(
-"✅ Dialogue "+(index+1)+
-" saved."
+"✅ Character "+characterNumber+
+" dialogue saved."
 );
 
 }
 
 
-/* PREVIEW */
+/* =========================
+   PREVIEW DIALOGUE
+========================= */
 
 function previewDialogue(index){
 
-const item=
+const item =
 dialogueData[index];
 
-if(!item)return;
+if(!item){
+return;
+}
 
-const video=
+
+const video =
 document.getElementById(
 "videoPreview"
 );
 
-const time=
-parseTime(item.startTime);
+
+const time =
+parseTime(
+item.startTime
+);
+
 
 if(!isNaN(time)){
 
-video.currentTime=time;
+video.currentTime =
+time;
+
 video.play();
 
 }
 
-const voice=
-document.getElementById(
-"voice-"+index
-);
-
-const voiceName=
-voice.options[
-voice.selectedIndex
-].text;
 
 alert(
-"🎙️ Voice:\n"+
-voiceName+
+"🎙️ Voice: "+
+getVoiceName(item.voice)+
 "\n\n"+
-"👤 Character:\n"+
-(item.speaker||"Character")+
-"\n\n"+
-"📝 Dialogue:\n"+
-(item.translation||"")
+"Dialogue:\n"+
+item.translation
 );
 
 }
 
 
-/* TIME */
+/* =========================
+   VOICE NAME
+========================= */
+
+function getVoiceName(voice){
+
+const names = {
+
+voice1:"👨 Male 1 — Natural",
+
+voice2:"👩 Female 1 — Natural",
+
+voice3:"👨 Male 2 — Deep",
+
+voice4:"👩 Female 2 — Soft",
+
+voice5:"👨 Male 3 — Young",
+
+voice6:"👩 Female 3 — Young",
+
+voice7:"👨 Male 4 — Anime",
+
+voice8:"👩 Female 4 — Anime",
+
+voice9:"🎙️ Neutral"
+
+};
+
+return names[voice] || voice;
+
+}
+
+
+/* =========================
+   TIME
+========================= */
 
 function parseTime(value){
 
-if(!value)return NaN;
+if(!value){
+return NaN;
+}
 
-const parts=
+
+const parts =
 value.split(":");
 
-if(parts.length!==2)return NaN;
 
-const minutes=
-parseInt(parts[0],10);
+if(parts.length!==2){
+return NaN;
+}
 
-const seconds=
-parseFloat(parts[1]);
+
+const minutes =
+parseInt(
+parts[0],
+10
+);
+
+
+const seconds =
+parseFloat(
+parts[1]
+);
+
 
 if(
-isNaN(minutes)||
+isNaN(minutes) ||
 isNaN(seconds)
 ){
 
@@ -886,23 +1039,35 @@ return NaN;
 
 }
 
-return minutes*60+seconds;
+
+return (
+minutes*60+
+seconds
+);
 
 }
 
 
-/* SECURITY */
+/* =========================
+   SECURITY
+========================= */
 
 function escapeHtml(value){
 
 return String(value)
+
 .replace(/&/g,"&amp;")
+
 .replace(/</g,"&lt;")
+
 .replace(/>/g,"&gt;")
+
 .replace(/"/g,"&quot;")
+
 .replace(/'/g,"&#039;");
 
 }
+
 
 function escapeAttr(value){
 
@@ -913,4 +1078,4 @@ return escapeHtml(value);
 </script>
 
 </body>
-</html>
+  </html>
