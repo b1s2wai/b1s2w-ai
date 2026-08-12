@@ -735,7 +735,18 @@ onclick="previewDialogue(${index})"
 >
 ▶️ Preview Dialogue
 </button>
+<button
+class="voice-button"
+onclick="generateVoice(${index})"
+>
+🎙️ Generate Voice
+</button>
 
+<audio
+id="audio-${index}"
+controls
+style="width:100%;margin-top:10px;display:none;"
+></audio>
 
 <button
 class="save-button"
@@ -1074,8 +1085,137 @@ function escapeAttr(value){
 return escapeHtml(value);
 
 }
+async function generateVoice(index){
 
+  const item = dialogueData[index];
+
+  if(!item){
+    return;
+  }
+
+  const text =
+    item.translation ||
+    item.transcript ||
+    "";
+
+  if(!text.trim()){
+
+    alert(
+      "❌ এই Character-এর dialogue পাওয়া যায়নি।"
+    );
+
+    return;
+  }
+
+  const voice =
+    item.voice ||
+    `voice${getCharacterNumber(item,index)}`;
+
+  const button =
+    document.querySelector(
+      `button[onclick="generateVoice(${index})"]`
+    );
+
+  const audio =
+    document.getElementById(
+      `audio-${index}`
+    );
+
+  if(button){
+    button.disabled = true;
+    button.textContent =
+      "⏳ Generating Voice...";
+  }
+
+  try{
+
+    const response =
+      await fetch(
+        "/api/generate-voice",
+        {
+          method:"POST",
+
+          headers:{
+            "Content-Type":
+              "application/json"
+          },
+
+          body:JSON.stringify({
+
+            text:text,
+
+            voice:voice
+
+          })
+
+        }
+      );
+
+    const data =
+      await response.json();
+
+    if(!response.ok){
+
+      throw new Error(
+        data.error ||
+        "Voice generation failed."
+      );
+
+    }
+
+    if(!data.audio){
+
+      throw new Error(
+        "Audio পাওয়া যায়নি।"
+      );
+
+    }
+
+    audio.src =
+      data.audio;
+
+    audio.style.display =
+      "block";
+
+    audio.load();
+
+    alert(
+      "✅ Voice তৈরি হয়েছে!\n\n" +
+      "Character: Character " +
+      getCharacterNumber(item,index) +
+      "\nVoice: " +
+      getVoiceName(voice)
+    );
+
+  }catch(error){
+
+    alert(
+      "❌ Voice Error:\n\n" +
+      error.message
+    );
+
+  }finally{
+
+    if(button){
+
+      button.disabled = false;
+
+      button.textContent =
+        "🎙️ Generate Voice";
+
+    }
+
+  }
+
+}
 </script>
+.voice-button{
+  background:#0ea5e9;
+  margin-top:10px;
+}
 
+.voice-button:disabled{
+  opacity:.6;
+}
 </body>
   </html>
