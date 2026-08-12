@@ -19,99 +19,283 @@ export default async function handler(req, res) {
       });
     }
 
+    const apiKey =
+      process.env.GEMINI_API_KEY;
+
+    if (!apiKey) {
+      return res.status(500).json({
+        error:
+          "GEMINI_API_KEY is missing in Vercel."
+      });
+    }
+
     /*
-     * আপাতত voice mapping তৈরি করছি।
-     *
-     * Character 1 → voice1
-     * Character 2 → voice2
-     * Character 3 → voice3
+     * B1S2W Voice → Gemini Voice
      */
 
     const voiceMap = {
 
-      voice1: {
-        name: "Male 1",
-        description: "Natural male voice"
-      },
-
-      voice2: {
-        name: "Female 1",
-        description: "Natural female voice"
-      },
-
-      voice3: {
-        name: "Male 2",
-        description: "Deep male voice"
-      },
-
-      voice4: {
-        name: "Female 2",
-        description: "Soft female voice"
-      },
-
-      voice5: {
-        name: "Male 3",
-        description: "Young male voice"
-      },
-
-      voice6: {
-        name: "Female 3",
-        description: "Young female voice"
-      },
-
-      voice7: {
-        name: "Male 4",
-        description: "Anime male voice"
-      },
-
-      voice8: {
-        name: "Female 4",
-        description: "Anime female voice"
-      },
-
-      voice9: {
-        name: "Neutral",
-        description: "Neutral voice"
-      }
+      voice1: "Kore",
+      voice2: "Aoede",
+      voice3: "Fenrir",
+      voice4: "Aoede",
+      voice5: "Puck",
+      voice6: "Aoede",
+      voice7: "Puck",
+      voice8: "Aoede",
+      voice9: "Kore"
 
     };
 
-    const selectedVoice =
+    const geminiVoice =
       voiceMap[voice] ||
-      voiceMap.voice1;
+      "Kore";
+
 
     /*
-     * এখানে পরের ধাপে আসল TTS API
-     * connect করা হবে।
+     * Generate speech
      */
+
+    const response = await fetch(
+      "https://generativelanguage.googleapis.com/v1beta/interactions",
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type":
+            "application/json",
+
+          "x-goog-api-key":
+            apiKey
+        },
+
+        body: JSON.stringify({
+
+          model:
+            "gemini-3.1-flash-tts-preview",
+
+          input:
+            `Synthesize the following dialogue naturally. Do not add or remove words. Speak only the dialogue.\n\n${text}`,
+
+          response_format: {
+            type: "audio"
+          },
+
+          generation_config: {
+
+            speech_config: [
+
+              {
+                voice:
+                  geminiVoice
+              }
+
+            ]
+
+          }
+
+        })
+
+      }
+    );
+
+
+    const data =
+      await response.json();
+
+
+    if (!response.ok) {
+
+      return res.status(
+        response.status
+      ).json({
+
+        error:
+          data?.error?.message ||
+          "Gemini TTS request failed."
+
+      });
+
+    }
+
+
+    /*
+     * Gemini audio output
+     */
+
+    const audioData =
+      data?.output_audio?.data;
+
+
+    if (!audioData) {
+
+      return res.status(500).json({
+
+        error:
+          "Gemini returned no audio."
+
+      });
+
+    }
+
+
+    /*
+     * Gemini TTS audio is PCM.
+     *
+     * Convert PCM → WAV
+     */
+
+    const wavBase64 =
+      pcmToWavBase64(
+        audioData
+      );
+
 
     return res.status(200).json({
 
       success: true,
 
-      text,
+      voice:
+        voice || "voice1",
 
-      voice: voice || "voice1",
+      geminiVoice,
 
-      voiceName:
-        selectedVoice.name,
-
-      description:
-        selectedVoice.description,
-
-      message:
-        "Voice configuration ready."
+      audio:
+        `data:audio/wav;base64,${wavBase64}`
 
     });
+
 
   } catch (error) {
 
     return res.status(500).json({
+
       error:
         error.message ||
         "Voice generation failed."
+
     });
 
   }
 
-      }
+}
+
+
+/*
+ * ==========================================
+ * PCM → WAV
+ * ==========================================
+ */
+
+function pcmToWavBase64(
+  base64PCM
+) {
+
+  const pcm =
+    Buffer.from(
+      base64PCM,
+      "base64"
+    );
+
+
+  const sampleRate =
+    24000;
+
+  const channels =
+    1;
+
+  const bitsPerSample =
+    16;
+
+  const byteRate =
+    sampleRate *
+    channels *
+    bitsPerSample / 8;
+
+  const blockAlign =
+    channels *
+    bitsPerSample / 8;
+
+
+  const header =
+    Buffer.alloc(44);
+
+
+  header.write(
+    "RIFF",
+    0
+  );
+
+  header.writeUInt32LE(
+    36 + pcm.length,
+    4
+  );
+
+  header.write(
+    "WAVE",
+    8
+  );
+
+  header.write(
+    "fmt ",
+    12
+  );
+
+  header.writeUInt32LE(
+    16,
+    16
+  );
+
+  header.writeUInt16LE(
+    1,
+    20
+  );
+
+  header.writeUInt16LE(
+    channels,
+    22
+  );
+
+  header.writeUInt32LE(
+    sampleRate,
+    24
+  );
+
+  header.writeUInt32LE(
+    byteRate,
+    28
+  );
+
+  header.writeUInt16LE(
+    blockAlign,
+    32
+  );
+
+  header.writeUInt16LE(
+    bitsPerSample,
+    34
+  );
+
+  header.write(
+    "data",
+    36
+  );
+
+  header.writeUInt32LE(
+    pcm.length,
+    40
+  );
+
+
+  const wav =
+    Buffer.concat([
+      header,
+      pcm
+    ]);
+
+
+  return wav.toString(
+    "base64"
+  );
+
+}
