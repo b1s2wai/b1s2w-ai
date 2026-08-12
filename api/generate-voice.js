@@ -31,18 +31,20 @@ export default async function handler(req, res) {
 
 
     const voiceMap = {
+  voice1: "Fenrir",
+  voice2: "Aoede",
+  voice3: "Orus",
+  voice4: "Kore",
+  voice5: "Puck",
+  voice6: "Leda",
+  voice7: "Charon",
+  voice8: "Zephyr",
+  voice9: "Kore"
+};
 
-      voice1: "Kore",
-      voice2: "Aoede",
-      voice3: "Fenrir",
-      voice4: "Aoede",
-      voice5: "Puck",
-      voice6: "Aoede",
-      voice7: "Puck",
-      voice8: "Aoede",
-      voice9: "Kore"
+      
 
-    };
+    
 
 
     const geminiVoice =
