@@ -78,6 +78,7 @@ button{
 
 button:disabled{
   opacity:.6;
+  cursor:not-allowed;
 }
 
 .video-preview{
@@ -151,8 +152,16 @@ button:disabled{
   background:#2563eb;
 }
 
+.voice-button{
+  background:#0ea5e9;
+}
+
 .save-button{
   background:#9333ea;
+}
+
+.cache-button{
+  background:#475569;
 }
 
 .empty{
@@ -161,7 +170,19 @@ button:disabled{
   padding:20px;
 }
 
+.cache-status{
+  margin-top:8px;
+  color:#22c55e;
+  font-size:13px;
+}
+
+.audio-box{
+  width:100%;
+  margin-top:10px;
+}
+
 @media(max-width:600px){
+
   .language-grid,
   .small-grid{
     grid-template-columns:1fr;
@@ -171,6 +192,7 @@ button:disabled{
     flex-direction:column;
     align-items:flex-start;
   }
+
 }
 </style>
 </head>
@@ -179,18 +201,33 @@ button:disabled{
 
 <div class="container">
 
+<!-- =========================
+     HEADER
+========================= -->
+
 <div class="header">
+
 <h1>🤖 B1S2W AI</h1>
-<p>🎬 AI Video Language Converter & Dialogue Timeline</p>
+
+<p>
+🎬 AI Video Language Converter & Dialogue Timeline
+</p>
+
 </div>
+
+
+<!-- =========================
+     VIDEO CARD
+========================= -->
 
 <div class="card">
 
 <h2>🎬 Video Language Converter</h2>
 
 <p style="color:#9ca3af;">
-ভিডিও Upload করো এবং dialogue আলাদা করে translation তৈরি করো।
+ভিডিও Upload করো এবং প্রতিটি Character-এর dialogue আলাদা করে বিশ্লেষণ ও translation তৈরি করো।
 </p>
+
 
 <input
 id="videoFile"
@@ -199,11 +236,15 @@ accept="video/*"
 onchange="previewVideo()"
 >
 
+
 <video
 id="videoPreview"
 class="video-preview"
 controls
 ></video>
+
+
+<!-- LANGUAGE -->
 
 <div class="language-grid">
 
@@ -213,17 +254,38 @@ controls
 
 <select id="originalLanguage">
 
-<option value="auto">🌐 Auto Detect</option>
-<option value="bengali">🇧🇩 বাংলা</option>
-<option value="hindi">🇮🇳 हिन्दी</option>
-<option value="english">🇺🇸 English</option>
-<option value="japanese">🇯🇵 日本語</option>
-<option value="korean">🇰🇷 한국어</option>
-<option value="chinese">🇨🇳 中文</option>
+<option value="auto">
+🌐 Auto Detect
+</option>
+
+<option value="bengali">
+🇧🇩 বাংলা
+</option>
+
+<option value="hindi">
+🇮🇳 हिन्दी
+</option>
+
+<option value="english">
+🇺🇸 English
+</option>
+
+<option value="japanese">
+🇯🇵 日本語
+</option>
+
+<option value="korean">
+🇰🇷 한국어
+</option>
+
+<option value="chinese">
+🇨🇳 中文
+</option>
 
 </select>
 
 </div>
+
 
 <div>
 
@@ -231,12 +293,29 @@ controls
 
 <select id="targetLanguage">
 
-<option value="bengali">🇧🇩 বাংলা</option>
-<option value="hindi">🇮🇳 हिन्दी</option>
-<option value="english">🇺🇸 English</option>
-<option value="japanese">🇯🇵 日本語</option>
-<option value="korean">🇰🇷 한국어</option>
-<option value="chinese">🇨🇳 中文</option>
+<option value="bengali">
+🇧🇩 বাংলা
+</option>
+
+<option value="hindi">
+🇮🇳 हिन्दी
+</option>
+
+<option value="english">
+🇺🇸 English
+</option>
+
+<option value="japanese">
+🇯🇵 日本語
+</option>
+
+<option value="korean">
+🇰🇷 한국어
+</option>
+
+<option value="chinese">
+🇨🇳 中文
+</option>
 
 </select>
 
@@ -244,16 +323,29 @@ controls
 
 </div>
 
+
 <button
 id="translateButton"
 onclick="translateVideo()"
 >
+
 🌐 Analyze & Translate Video
+
 </button>
 
-<div id="videoStatus" class="status"></div>
+
+<div
+id="videoStatus"
+class="status"
+></div>
 
 </div>
+
+
+
+<!-- =========================
+     TIMELINE
+========================= -->
 
 <div
 id="timelineCard"
@@ -264,868 +356,997 @@ style="display:none;"
 <h2>🎬 Dialogue Timeline</h2>
 
 <p style="color:#9ca3af;">
+
 প্রতিটি Character-এর dialogue, timing এবং voice আলাদাভাবে edit করতে পারবে।
+
 </p>
 
+
 <div id="detectedLanguage"></div>
+
 
 <div
 id="dialogueTimeline"
 class="timeline"
 ></div>
 
+
 </div>
 
 </div>
+
+
 
 <script>
+
+/* =================================
+   GLOBAL DATA
+================================= */
 
 let dialogueData = [];
 
 
-/* =========================
+
+/* =================================
    VIDEO PREVIEW
-========================= */
+================================= */
 
 function previewVideo(){
 
-const file =
-document.getElementById("videoFile").files[0];
+  const file =
+    document.getElementById(
+      "videoFile"
+    ).files[0];
 
-const video =
-document.getElementById("videoPreview");
+  const video =
+    document.getElementById(
+      "videoPreview"
+    );
 
-if(!file){
+  if(!file){
 
-video.style.display="none";
-return;
+    video.style.display =
+      "none";
+
+    video.removeAttribute(
+      "src"
+    );
+
+    return;
+
+  }
+
+  video.src =
+    URL.createObjectURL(file);
+
+  video.style.display =
+    "block";
 
 }
 
-video.src =
-URL.createObjectURL(file);
-
-video.style.display="block";
-
-}
 
 
-/* =========================
+/* =================================
    TRANSLATE VIDEO
-========================= */
+================================= */
 
 async function translateVideo(){
 
-const file =
-document.getElementById("videoFile").files[0];
+  const file =
+    document.getElementById(
+      "videoFile"
+    ).files[0];
 
-const original =
-document.getElementById("originalLanguage").value;
+  const original =
+    document.getElementById(
+      "originalLanguage"
+    ).value;
 
-const target =
-document.getElementById("targetLanguage").value;
+  const target =
+    document.getElementById(
+      "targetLanguage"
+    ).value;
 
-const status =
-document.getElementById("videoStatus");
+  const status =
+    document.getElementById(
+      "videoStatus"
+    );
 
-const button =
-document.getElementById("translateButton");
+  const button =
+    document.getElementById(
+      "translateButton"
+    );
 
-const timelineCard =
-document.getElementById("timelineCard");
+  const timelineCard =
+    document.getElementById(
+      "timelineCard"
+    );
 
 
-if(!file){
+  if(!file){
 
-status.textContent =
-"❌ আগে একটি ভিডিও Upload করো।";
+    status.textContent =
+      "❌ আগে একটি ভিডিও Upload করো।";
 
-return;
+    return;
+
+  }
+
+
+  if(original === target){
+
+    status.textContent =
+      "❌ Original Language এবং Translate To একই হতে পারবে না।";
+
+    return;
+
+  }
+
+
+  button.disabled =
+    true;
+
+  timelineCard.style.display =
+    "none";
+
+
+  status.textContent =
+    "⏳ Video AI-তে পাঠানো হচ্ছে...";
+
+
+  try{
+
+    const arrayBuffer =
+      await file.arrayBuffer();
+
+    const bytes =
+      new Uint8Array(
+        arrayBuffer
+      );
+
+    let binary = "";
+
+    const chunkSize =
+      0x8000;
+
+
+    for(
+      let i = 0;
+      i < bytes.length;
+      i += chunkSize
+    ){
+
+      binary +=
+        String.fromCharCode(
+          ...bytes.subarray(
+            i,
+            Math.min(
+              i + chunkSize,
+              bytes.length
+            )
+          )
+        );
+
+    }
+
+
+    const videoBase64 =
+      btoa(binary);
+
+
+    status.textContent =
+      "🤖 AI ভিডিও বিশ্লেষণ করছে...\n\n" +
+      "👥 Speakers শনাক্ত করা হচ্ছে...\n" +
+      "⏱ Dialogue timing বের করা হচ্ছে...\n" +
+      "🌐 Translation তৈরি হচ্ছে...";
+
+
+    const response =
+      await fetch(
+        "/api/translate-video",
+        {
+
+          method:
+            "POST",
+
+          headers:{
+            "Content-Type":
+              "application/json"
+          },
+
+          body:
+            JSON.stringify({
+
+              videoBase64:
+                videoBase64,
+
+              mimeType:
+                file.type,
+
+              originalLanguage:
+                original,
+
+              targetLanguage:
+                target
+
+            })
+
+        }
+      );
+
+
+    const data =
+      await response.json();
+
+
+    if(!response.ok){
+
+      throw new Error(
+        data.error ||
+        "Translation failed."
+      );
+
+    }
+
+
+    dialogueData =
+      Array.isArray(
+        data.dialogues
+      )
+      ? data.dialogues
+      : [];
+
+
+    document.getElementById(
+      "detectedLanguage"
+    ).innerHTML =
+
+      "<b>🔎 Detected Language:</b> " +
+
+      escapeHtml(
+        data.detectedLanguage ||
+        "Unknown"
+      );
+
+
+    renderTimeline();
+
+
+    timelineCard.style.display =
+      "block";
+
+
+    status.textContent =
+      "✅ Dialogue analysis complete!";
+
+
+  }catch(error){
+
+    status.textContent =
+      "❌ Error:\n" +
+      error.message;
+
+  }finally{
+
+    button.disabled =
+      false;
+
+  }
 
 }
 
 
-if(original === target){
 
-status.textContent =
-"❌ Original Language এবং Translate To একই হতে পারবে না।";
+/* =================================
+   VOICE LIST
+================================= */
 
-return;
-
-}
-
-
-button.disabled=true;
-
-timelineCard.style.display="none";
-
-status.textContent =
-"⏳ Video AI-তে পাঠানো হচ্ছে...";
-
-
-try{
-
-const arrayBuffer =
-await file.arrayBuffer();
-
-const bytes =
-new Uint8Array(arrayBuffer);
-
-let binary="";
-
-const chunkSize=0x8000;
-
-for(
-let i=0;
-i<bytes.length;
-i+=chunkSize
+function getVoiceOptions(
+  selectedVoice
 ){
 
-binary += String.fromCharCode(
-...bytes.subarray(
-i,
-Math.min(
-i+chunkSize,
-bytes.length
-)
-)
-);
+  const voices = [
 
-}
+    {
+      id:"voice1",
+      name:"👨 Male 1 — Natural"
+    },
 
-const videoBase64 =
-btoa(binary);
+    {
+      id:"voice2",
+      name:"👩 Female 1 — Natural"
+    },
 
+    {
+      id:"voice3",
+      name:"👨 Male 2 — Deep"
+    },
 
-status.textContent =
-"🤖 AI ভিডিও বিশ্লেষণ করছে...\n\n"+
-"👥 Speakers শনাক্ত করা হচ্ছে...\n"+
-"⏱ Dialogue timing বের করা হচ্ছে...\n"+
-"🌐 Translation তৈরি হচ্ছে...";
+    {
+      id:"voice4",
+      name:"👩 Female 2 — Soft"
+    },
 
+    {
+      id:"voice5",
+      name:"👨 Male 3 — Young"
+    },
 
-const response =
-await fetch(
-"/api/translate-video",
-{
+    {
+      id:"voice6",
+      name:"👩 Female 3 — Young"
+    },
 
-method:"POST",
+    {
+      id:"voice7",
+      name:"👨 Male 4 — Anime"
+    },
 
-headers:{
-"Content-Type":"application/json"
-},
+    {
+      id:"voice8",
+      name:"👩 Female 4 — Anime"
+    },
 
-body:JSON.stringify({
+    {
+      id:"voice9",
+      name:"🎙️ Neutral"
+    }
 
-videoBase64,
-
-mimeType:file.type,
-
-originalLanguage:original,
-
-targetLanguage:target
-
-})
-
-});
-
-
-const data =
-await response.json();
+  ];
 
 
-if(!response.ok){
+  return voices.map(
+    voice => `
 
-throw new Error(
-data.error ||
-"Translation failed."
-);
+      <option
+        value="${voice.id}"
+        ${
+          voice.id === selectedVoice
+          ? "selected"
+          : ""
+        }
+      >
+        ${voice.name}
+      </option>
 
-}
-
-
-dialogueData =
-Array.isArray(data.dialogues)
-? data.dialogues
-: [];
-
-
-document.getElementById(
-"detectedLanguage"
-).innerHTML =
-"<b>🔎 Detected Language:</b> "+
-escapeHtml(
-data.detectedLanguage ||
-"Unknown"
-);
-
-
-renderTimeline();
-
-
-timelineCard.style.display="block";
-
-
-status.textContent =
-"✅ Dialogue analysis complete!";
-
-
-}catch(error){
-
-status.textContent =
-"❌ Error:\n"+
-error.message;
-
-}finally{
-
-button.disabled=false;
-
-}
+    `
+  ).join("");
 
 }
 
 
-/* =========================
-   VOICE LIST
-========================= */
 
-function getVoiceOptions(selectedVoice){
-
-const voices = [
-
-{
-id:"voice1",
-name:"👨 Male 1 — Natural"
-},
-
-{
-id:"voice2",
-name:"👩 Female 1 — Natural"
-},
-
-{
-id:"voice3",
-name:"👨 Male 2 — Deep"
-},
-
-{
-id:"voice4",
-name:"👩 Female 2 — Soft"
-},
-
-{
-id:"voice5",
-name:"👨 Male 3 — Young"
-},
-
-{
-id:"voice6",
-name:"👩 Female 3 — Young"
-},
-
-{
-id:"voice7",
-name:"👨 Male 4 — Anime"
-},
-
-{
-id:"voice8",
-name:"👩 Female 4 — Anime"
-},
-
-{
-id:"voice9",
-name:"🎙️ Neutral"
-}
-
-];
-
-
-return voices.map(
-voice => `
-
-<option
-value="${voice.id}"
-${voice.id === selectedVoice ? "selected" : ""}
->
-${voice.name}
-</option>
-
-`
-).join("");
-
-}
-
-
-/* =========================
+/* =================================
    RENDER TIMELINE
-========================= */
+================================= */
 
 function renderTimeline(){
 
-const container =
-document.getElementById(
-"dialogueTimeline"
-);
+  const container =
+    document.getElementById(
+      "dialogueTimeline"
+    );
 
-container.innerHTML="";
+  container.innerHTML =
+    "";
 
 
-if(!dialogueData.length){
+  if(!dialogueData.length){
 
-container.innerHTML =
-'<div class="empty">'+
-'কোনো dialogue পাওয়া যায়নি।'+
-'</div>';
+    container.innerHTML =
+      '<div class="empty">' +
+      'কোনো dialogue পাওয়া যায়নি।' +
+      '</div>';
 
-return;
+    return;
+
+  }
+
+
+  dialogueData.forEach(
+    (item,index) => {
+
+      const characterNumber =
+        getCharacterNumber(
+          item,
+          index
+        );
+
+
+      const defaultVoice =
+        item.voice ||
+        `voice${characterNumber}`;
+
+
+      item.voice =
+        defaultVoice;
+
+
+      const card =
+        document.createElement(
+          "div"
+        );
+
+
+      card.className =
+        "dialogue-card";
+
+
+      card.innerHTML = `
+
+        <div
+          class="dialogue-header"
+        >
+
+          <div class="speaker">
+
+            👤 Character
+            ${characterNumber}
+
+          </div>
+
+
+          <div class="time">
+
+            ⏱
+            ${escapeHtml(
+              item.startTime ||
+              "00:00.00"
+            )}
+
+            →
+
+            ${escapeHtml(
+              item.endTime ||
+              "00:00.00"
+            )}
+
+          </div>
+
+        </div>
+
+
+        <div
+          class="small-grid"
+        >
+
+          <div>
+
+            <label>
+              Start Time
+            </label>
+
+            <input
+              id="start-${index}"
+              value="${escapeAttr(
+                item.startTime ||
+                "00:00.00"
+              )}"
+            >
+
+          </div>
+
+
+          <div>
+
+            <label>
+              End Time
+            </label>
+
+            <input
+              id="end-${index}"
+              value="${escapeAttr(
+                item.endTime ||
+                "00:00.00"
+              )}"
+            >
+
+          </div>
+
+        </div>
+
+
+        <div>
+
+          <label>
+            📝 Original Dialogue
+          </label>
+
+          <textarea
+            id="original-${index}"
+          >${escapeHtml(
+            item.transcript ||
+            ""
+          )}</textarea>
+
+        </div>
+
+
+        <div>
+
+          <label>
+            🌐 Translation
+          </label>
+
+          <textarea
+            id="translation-${index}"
+          >${escapeHtml(
+            item.translation ||
+            ""
+          )}</textarea>
+
+        </div>
+
+
+        <div class="voice-row">
+
+          <label>
+            🎙️ Character Voice
+          </label>
+
+          <select
+            id="voice-${index}"
+            onchange="changeVoice(${index})"
+          >
+
+            ${getVoiceOptions(
+              defaultVoice
+            )}
+
+          </select>
+
+        </div>
+
+
+        <div
+          id="cache-status-${index}"
+          class="cache-status"
+        ></div>
+
+
+        <button
+          class="edit-button"
+          onclick="previewDialogue(${index})"
+        >
+
+          ▶️ Preview Dialogue
+
+        </button>
+
+
+        <button
+          class="voice-button"
+          onclick="generateVoice(${index})"
+        >
+
+          🎙️ Generate Voice
+
+        </button>
+
+
+        <audio
+          id="audio-${index}"
+          class="audio-box"
+          controls
+          style="display:none;"
+        ></audio>
+
+
+        <button
+          class="save-button"
+          onclick="saveDialogue(${index})"
+        >
+
+          💾 Save Changes
+
+        </button>
+
+      `;
+
+
+      container.appendChild(
+        card
+      );
+
+
+      /*
+       * Cached audio থাকলে
+       * সঙ্গে সঙ্গে player দেখানো
+       */
+
+      loadCachedVoice(
+        index
+      );
+
+    }
+  );
 
 }
 
 
-dialogueData.forEach(
-(item,index)=>{
 
-
-/*
- * Character number বের করা
- */
-
-const characterNumber =
-getCharacterNumber(item,index);
-
-
-/*
- * Backend voice না দিলে
- * Character number অনুযায়ী voice।
- */
-
-const defaultVoice =
-item.voice ||
-`voice${characterNumber}`;
-
-
-/*
- * একই Character-এর voice
- * সব dialogue-এ একই থাকবে।
- */
-
-item.voice =
-defaultVoice;
-
-
-const card =
-document.createElement("div");
-
-card.className =
-"dialogue-card";
-
-
-card.innerHTML = `
-
-<div class="dialogue-header">
-
-<div class="speaker">
-
-👤 Character ${characterNumber}
-
-</div>
-
-<div class="time">
-
-⏱ ${escapeHtml(
-item.startTime ||
-"00:00.00"
-)}
-
-→
-
-${escapeHtml(
-item.endTime ||
-"00:00.00"
-)}
-
-</div>
-
-</div>
-
-
-<div class="small-grid">
-
-<div>
-
-<label>Start Time</label>
-
-<input
-id="start-${index}"
-value="${escapeAttr(
-item.startTime ||
-"00:00.00"
-)}"
->
-
-</div>
-
-
-<div>
-
-<label>End Time</label>
-
-<input
-id="end-${index}"
-value="${escapeAttr(
-item.endTime ||
-"00:00.00"
-)}"
->
-
-</div>
-
-</div>
-
-
-<div>
-
-<label>📝 Original Dialogue</label>
-
-<textarea
-id="original-${index}"
->${escapeHtml(
-item.transcript ||
-""
-)}</textarea>
-
-</div>
-
-
-<div>
-
-<label>🌐 Translation</label>
-
-<textarea
-id="translation-${index}"
->${escapeHtml(
-item.translation ||
-""
-)}</textarea>
-
-</div>
-
-
-<div class="voice-row">
-
-<label>
-🎙️ Character Voice
-</label>
-
-<select id="voice-${index}">
-
-${getVoiceOptions(
-defaultVoice
-)}
-
-</select>
-
-</div>
-
-
-<button
-class="edit-button"
-onclick="previewDialogue(${index})"
->
-▶️ Preview Dialogue
-</button>
-<button
-class="voice-button"
-onclick="generateVoice(${index})"
->
-🎙️ Generate Voice
-</button>
-
-<audio
-id="audio-${index}"
-controls
-style="width:100%;margin-top:10px;display:none;"
-></audio>
-
-<button
-class="save-button"
-onclick="saveDialogue(${index})"
->
-💾 Save Changes
-</button>
-
-`;
-
-
-container.appendChild(card);
-
-});
-
-}
-
-
-/* =========================
+/* =================================
    CHARACTER NUMBER
-========================= */
+================================= */
 
-function getCharacterNumber(item,index){
-
-const speakerId =
-String(
-item.speakerId ||
-""
-);
-
-
-const idMatch =
-speakerId.match(
-/(?:speaker[_ -]?)(\d+)/i
-);
-
-
-if(idMatch){
-
-const number =
-parseInt(
-idMatch[1],
-10
-);
-
-if(
-Number.isInteger(number) &&
-number>0
+function getCharacterNumber(
+  item,
+  index
 ){
 
-return number;
+  const speakerId =
+    String(
+      item?.speakerId ||
+      ""
+    );
+
+
+  const idMatch =
+    speakerId.match(
+      /(?:speaker[_ -]?)(\d+)/i
+    );
+
+
+  if(idMatch){
+
+    const number =
+      parseInt(
+        idMatch[1],
+        10
+      );
+
+
+    if(
+      Number.isInteger(number) &&
+      number > 0
+    ){
+
+      return number;
+
+    }
+
+  }
+
+
+  const speaker =
+    String(
+      item?.speaker ||
+      ""
+    );
+
+
+  const speakerMatch =
+    speaker.match(
+      /(?:character|speaker)[ _-]?(\d+)/i
+    );
+
+
+  if(speakerMatch){
+
+    const number =
+      parseInt(
+        speakerMatch[1],
+        10
+      );
+
+
+    if(
+      Number.isInteger(number) &&
+      number > 0
+    ){
+
+      return number;
+
+    }
+
+  }
+
+
+  return index + 1;
 
 }
 
-}
 
 
-const speaker =
-String(
-item.speaker ||
-""
-);
+/* =================================
+   CACHE KEY
+================================= */
 
-
-const speakerMatch =
-speaker.match(
-/(?:character|speaker)[ _-]?(\d+)/i
-);
-
-
-if(speakerMatch){
-
-const number =
-parseInt(
-speakerMatch[1],
-10
-);
-
-if(
-Number.isInteger(number) &&
-number>0
+function getVoiceCacheKey(
+  item,
+  index
 ){
 
-return number;
+  const characterNumber =
+    getCharacterNumber(
+      item,
+      index
+    );
+
+
+  const voice =
+    item.voice ||
+    `voice${characterNumber}`;
+
+
+  const text =
+    (
+      item.translation ||
+      item.transcript ||
+      ""
+    ).trim();
+
+
+  return (
+    "B1S2W_VOICE_CACHE_" +
+    characterNumber +
+    "_" +
+    voice +
+    "_" +
+    simpleHash(text)
+  );
 
 }
 
+
+
+/* =================================
+   SIMPLE HASH
+================================= */
+
+function simpleHash(text){
+
+  let hash = 0;
+
+
+  for(
+    let i = 0;
+    i < text.length;
+    i++
+  ){
+
+    hash =
+      (
+        (
+          hash << 5
+        ) -
+        hash +
+        text.charCodeAt(i)
+      ) |
+      0;
+
+  }
+
+
+  return String(hash);
+
 }
 
 
-return index+1;
 
-}
+/* =================================
+   LOAD CACHED VOICE
+================================= */
 
-
-/* =========================
-   SAVE DIALOGUE
-========================= */
-
-function saveDialogue(index){
-
-const item =
-dialogueData[index];
-
-if(!item){
-return;
-}
-
-
-item.startTime =
-document.getElementById(
-"start-"+index
-).value;
-
-
-item.endTime =
-document.getElementById(
-"end-"+index
-).value;
-
-
-item.transcript =
-document.getElementById(
-"original-"+index
-).value;
-
-
-item.translation =
-document.getElementById(
-"translation-"+index
-).value;
-
-
-item.voice =
-document.getElementById(
-"voice-"+index
-).value;
-
-
-/*
- * Save করার পর
- * একই Character-এর voice
- * পরের dialogue-তেও থাকবে।
- */
-
-const characterNumber =
-getCharacterNumber(
-item,
-index
-);
-
-
-dialogueData.forEach(
-(otherItem,otherIndex)=>{
-
-if(
-getCharacterNumber(
-otherItem,
-otherIndex
-) === characterNumber
+function loadCachedVoice(
+  index
 ){
 
-otherItem.voice =
-item.voice;
+  const item =
+    dialogueData[index];
 
-}
-
-});
-
-
-renderTimeline();
-
-
-alert(
-"✅ Character "+characterNumber+
-" dialogue saved."
-);
-
-}
-
-
-/* =========================
-   PREVIEW DIALOGUE
-========================= */
-
-function previewDialogue(index){
-
-const item =
-dialogueData[index];
-
-if(!item){
-return;
-}
-
-
-const video =
-document.getElementById(
-"videoPreview"
-);
-
-
-const time =
-parseTime(
-item.startTime
-);
-
-
-if(!isNaN(time)){
-
-video.currentTime =
-time;
-
-video.play();
-
-}
-
-
-alert(
-"🎙️ Voice: "+
-getVoiceName(item.voice)+
-"\n\n"+
-"Dialogue:\n"+
-item.translation
-);
-
-}
-
-
-/* =========================
-   VOICE NAME
-========================= */
-
-function getVoiceName(voice){
-
-const names = {
-
-voice1:"👨 Male 1 — Natural",
-
-voice2:"👩 Female 1 — Natural",
-
-voice3:"👨 Male 2 — Deep",
-
-voice4:"👩 Female 2 — Soft",
-
-voice5:"👨 Male 3 — Young",
-
-voice6:"👩 Female 3 — Young",
-
-voice7:"👨 Male 4 — Anime",
-
-voice8:"👩 Female 4 — Anime",
-
-voice9:"🎙️ Neutral"
-
-};
-
-return names[voice] || voice;
-
-}
-
-
-/* =========================
-   TIME
-========================= */
-
-function parseTime(value){
-
-if(!value){
-return NaN;
-}
-
-
-const parts =
-value.split(":");
-
-
-if(parts.length!==2){
-return NaN;
-}
-
-
-const minutes =
-parseInt(
-parts[0],
-10
-);
-
-
-const seconds =
-parseFloat(
-parts[1]
-);
-
-
-if(
-isNaN(minutes) ||
-isNaN(seconds)
-){
-
-return NaN;
-
-}
-
-
-return (
-minutes*60+
-seconds
-);
-
-}
-
-
-/* =========================
-   SECURITY
-========================= */
-
-function escapeHtml(value){
-
-return String(value)
-
-.replace(/&/g,"&amp;")
-
-.replace(/</g,"&lt;")
-
-.replace(/>/g,"&gt;")
-
-.replace(/"/g,"&quot;")
-
-.replace(/'/g,"&#039;");
-
-}
-
-
-function escapeAttr(value){
-
-return escapeHtml(value);
-
-}
-async function generateVoice(index){
-
-  const item = dialogueData[index];
 
   if(!item){
     return;
   }
 
-  const text =
-    item.translation ||
-    item.transcript ||
-    "";
 
-  if(!text.trim()){
-
-    alert(
-      "❌ এই Character-এর dialogue পাওয়া যায়নি।"
+  const cacheKey =
+    getVoiceCacheKey(
+      item,
+      index
     );
 
+
+  let cachedAudio =
+    null;
+
+
+  try{
+
+    cachedAudio =
+      localStorage.getItem(
+        cacheKey
+      );
+
+  }catch(error){
+
+    console.log(
+      "Cache read error:",
+      error
+    );
+
+  }
+
+
+  if(!cachedAudio){
     return;
   }
 
-  const voice =
-    item.voice ||
-    `voice${getCharacterNumber(item,index)}`;
-
-  const button =
-    document.querySelector(
-      `button[onclick="generateVoice(${index})"]`
-    );
 
   const audio =
     document.getElementById(
       `audio-${index}`
     );
 
+
+  const status =
+    document.getElementById(
+      `cache-status-${index}`
+    );
+
+
+  if(audio){
+
+    audio.src =
+      cachedAudio;
+
+    audio.style.display =
+      "block";
+
+    audio.load();
+
+  }
+
+
+  if(status){
+
+    status.textContent =
+      "⚡ Cached Voice ready — API call হবে না।";
+
+  }
+
+}
+
+
+
+/* =================================
+   GENERATE VOICE
+================================= */
+
+async function generateVoice(
+  index
+){
+
+  const item =
+    dialogueData[index];
+
+
+  if(!item){
+    return;
+  }
+
+
+  const text =
+    (
+      item.translation ||
+      item.transcript ||
+      ""
+    ).trim();
+
+
+  if(!text){
+
+    alert(
+      "❌ এই Character-এর dialogue পাওয়া যায়নি।"
+    );
+
+    return;
+
+  }
+
+
+  const characterNumber =
+    getCharacterNumber(
+      item,
+      index
+    );
+
+
+  const voice =
+    item.voice ||
+    `voice${characterNumber}`;
+
+
+  const audio =
+    document.getElementById(
+      `audio-${index}`
+    );
+
+
+  const status =
+    document.getElementById(
+      `cache-status-${index}`
+    );
+
+
+  const button =
+    document.querySelector(
+      `button[onclick="generateVoice(${index})"]`
+    );
+
+
+  /*
+   * =============================
+   * CHECK CACHE FIRST
+   * =============================
+   */
+
+  const cacheKey =
+    getVoiceCacheKey(
+      item,
+      index
+    );
+
+
+  try{
+
+    const cachedAudio =
+      localStorage.getItem(
+        cacheKey
+      );
+
+
+    if(cachedAudio){
+
+      audio.src =
+        cachedAudio;
+
+      audio.style.display =
+        "block";
+
+      audio.load();
+
+
+      if(status){
+
+        status.textContent =
+          "⚡ Cached Voice ব্যবহার করা হয়েছে।";
+
+      }
+
+
+      return;
+
+    }
+
+  }catch(error){
+
+    console.log(
+      "Cache check failed:",
+      error
+    );
+
+  }
+
+
+
+  /*
+   * =============================
+   * GENERATE NEW VOICE
+   * =============================
+   */
+
   if(button){
-    button.disabled = true;
+
+    button.disabled =
+      true;
+
     button.textContent =
       "⏳ Generating Voice...";
+
   }
+
 
   try{
 
@@ -1133,26 +1354,33 @@ async function generateVoice(index){
       await fetch(
         "/api/generate-voice",
         {
-          method:"POST",
+
+          method:
+            "POST",
 
           headers:{
             "Content-Type":
               "application/json"
           },
 
-          body:JSON.stringify({
+          body:
+            JSON.stringify({
 
-            text:text,
+              text:
+                text,
 
-            voice:voice
+              voice:
+                voice
 
-          })
+            })
 
         }
       );
 
+
     const data =
       await response.json();
+
 
     if(!response.ok){
 
@@ -1163,13 +1391,60 @@ async function generateVoice(index){
 
     }
 
+
     if(!data.audio){
 
       throw new Error(
-        "Audio পাওয়া যায়নি।"
+        "Audio পাওয়া যায়নি।"
       );
 
     }
+
+
+    /*
+     * =============================
+     * SAVE TO CACHE
+     * =============================
+     */
+
+    try{
+
+      localStorage.setItem(
+        cacheKey,
+        data.audio
+      );
+
+
+      if(status){
+
+        status.textContent =
+          "💾 Voice তৈরি হয়েছে এবং cache করা হয়েছে।";
+
+      }
+
+    }catch(cacheError){
+
+      console.log(
+        "Cache save failed:",
+        cacheError
+      );
+
+
+      if(status){
+
+        status.textContent =
+          "✅ Voice তৈরি হয়েছে। Cache করা যায়নি।";
+
+      }
+
+    }
+
+
+    /*
+     * =============================
+     * AUDIO PLAYER
+     * =============================
+     */
 
     audio.src =
       data.audio;
@@ -1179,13 +1454,16 @@ async function generateVoice(index){
 
     audio.load();
 
+
     alert(
       "✅ Voice তৈরি হয়েছে!\n\n" +
       "Character: Character " +
-      getCharacterNumber(item,index) +
+      characterNumber +
       "\nVoice: " +
-      getVoiceName(voice)
+      getVoiceName(voice) +
+      "\n\n💾 Voice cache করা হয়েছে।"
     );
+
 
   }catch(error){
 
@@ -1198,7 +1476,8 @@ async function generateVoice(index){
 
     if(button){
 
-      button.disabled = false;
+      button.disabled =
+        false;
 
       button.textContent =
         "🎙️ Generate Voice";
@@ -1208,14 +1487,104 @@ async function generateVoice(index){
   }
 
 }
-</script>
-.voice-button{
-  background:#0ea5e9;
-  margin-top:10px;
+
+
+
+/* =================================
+   CHANGE VOICE
+================================= */
+
+function changeVoice(
+  index
+){
+
+  const item =
+    dialogueData[index];
+
+
+  if(!item){
+    return;
+  }
+
+
+  const newVoice =
+    document.getElementById(
+      `voice-${index}`
+    ).value;
+
+
+  const characterNumber =
+    getCharacterNumber(
+      item,
+      index
+    );
+
+
+  /*
+   * একই Character-এর
+   * সব dialogue-এ একই voice
+   */
+
+  dialogueData.forEach(
+    (otherItem,otherIndex) => {
+
+      if(
+        getCharacterNumber(
+          otherItem,
+          otherIndex
+        ) ===
+        characterNumber
+      ){
+
+        otherItem.voice =
+          newVoice;
+
+      }
+
+    }
+  );
+
+
+  /*
+   * Voice বদলালে
+   * নতুন voice অনুযায়ী
+   * timeline refresh হবে।
+   */
+
+  renderTimeline();
+
 }
 
-.voice-button:disabled{
-  opacity:.6;
-}
-</body>
-  </html>
+
+
+/* =================================
+   SAVE DIALOGUE
+================================= */
+
+function saveDialogue(
+  index
+){
+
+  const item =
+    dialogueData[index];
+
+
+  if(!item){
+    return;
+  }
+
+
+  item.startTime =
+    document.getElementById(
+      `start-${index}`
+    ).value;
+
+
+  item.endTime =
+    document.getElementById(
+      `end-${index}`
+    ).value;
+
+
+  item.transcript =
+   
