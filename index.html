@@ -229,12 +229,53 @@ button:disabled{
 </p>
 
 
-<input
-id="videoFile"
-type="file"
-accept="video/*"
-onchange="previewVideo()"
->
+function previewVideo() {
+
+  const fileInput =
+    document.getElementById("videoFile");
+
+  const video =
+    document.getElementById("videoPreview");
+
+  const fileInfo =
+    document.getElementById("fileInfo");
+
+  const file =
+    fileInput.files &&
+    fileInput.files[0];
+
+  if (!file) {
+
+    video.removeAttribute("src");
+    video.style.display = "none";
+
+    fileInfo.textContent =
+      "কোনো ভিডিও নির্বাচন করা হয়নি।";
+
+    return;
+  }
+
+  console.log("Selected file:", file);
+  console.log("File name:", file.name);
+  console.log("File type:", file.type);
+  console.log("File size:", file.size);
+
+  const videoURL =
+    URL.createObjectURL(file);
+
+  video.src = videoURL;
+  video.style.display = "block";
+
+  fileInfo.textContent =
+    "✅ ভিডিও নির্বাচন হয়েছে\n" +
+    "ফাইল: " + file.name + "\n" +
+    "Type: " + (file.type || "Unknown") + "\n" +
+    "Size: " +
+    (file.size / 1024 / 1024).toFixed(2) +
+    " MB";
+
+  video.load();
+}
 
 
 <video
